@@ -2,14 +2,17 @@
 	import type { Preset } from './preset';
 
 	export let preset: Preset;
+	const url = `/presets/${preset.id}`;
 </script>
 
 <div class="preset-card">
-	<a href={`/presets/${preset.id}`}>
+	<a href={url}>
 		<div class="thumbnail" />
-		<p class="title">{preset.title}</p>
 	</a>
-	<p class="author">By <a href={`/users/${preset.author.id}`}>{preset.author.name}</a></p>
+	<div class="info">
+		<a href={url}><p class="title">{preset.title}</p></a>
+		<p class="author">By <a href={`/users/${preset.author.id}`}>{preset.author.name}</a></p>
+	</div>
 </div>
 
 <style lang="scss">
@@ -23,10 +26,20 @@
 		height: 200px;
 		width: 300px;
 
+		border: 1px solid #ccc;
+		border-radius: 10px 10px 15px 15px; // Hides the top corners behind the thumbnail
+
+		.info {
+			padding-left: 10px;
+			padding-right: 10px;
+		}
+
 		.thumbnail {
 			height: 60%;
 			width: 100%;
 			background-color: blue;
+
+			border-radius: 10px 10px 0 0;
 		}
 	}
 </style>

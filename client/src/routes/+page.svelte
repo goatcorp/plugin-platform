@@ -46,20 +46,20 @@
 		<!--Presets with a high absolute number of downloads-->
 		<div class="gallery">
 			{#each popularPresets as preset}
-				<PresetCard {preset} />
+				<div class="wrapper"><PresetCard {preset} /></div>
 			{/each}
 		</div>
 		<h2>Trending</h2>
 		<!--Presets with a high rate of growth over the past 24 hours-->
 		<div class="gallery">
 			{#each trendingPresets as preset}
-				<PresetCard {preset} />
+				<div class="wrapper"><PresetCard {preset} /></div>
 			{/each}
 		</div>
 		<h2>New</h2>
 		<div class="gallery">
 			{#each newPresets as preset}
-				<PresetCard {preset} />
+				<div class="wrapper"><PresetCard {preset} /></div>
 			{/each}
 		</div>
 	</div>
@@ -84,5 +84,9 @@
 		min-height: 200px;
 		flex-wrap: wrap;
 		justify-content: space-around;
+
+		.wrapper {
+			margin-bottom: 10px;
+		}
 	}
 </style>
