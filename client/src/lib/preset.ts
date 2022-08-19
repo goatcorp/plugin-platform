@@ -11,4 +11,5 @@ export interface PresetData {
 	id: string;
 	preset: string;
 	data: string;
+	title: string;
 }
