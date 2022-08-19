@@ -1,15 +1,16 @@
 <script lang="ts">
-	import PresetSearchResult from '$lib/PresetRow.svelte';
 	import type { PageData } from './$types';
+	import PresetRow from '$lib/PresetRow.svelte';
 
 	export let data: PageData;
 </script>
 
-<h1>Results for "{data.query}":</h1>
+<h1>{data.profile.name}</h1>
 
-<div class="results">
-	{#each data.results as preset}
-		<PresetSearchResult {preset} authorName={data.authors[preset.author]} />
+<h2>Plugin presets</h2>
+<div>
+	{#each data.presets as preset}
+		<PresetRow {preset} authorName="" />
 	{/each}
 </div>
 
