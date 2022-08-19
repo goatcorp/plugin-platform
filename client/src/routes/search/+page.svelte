@@ -9,7 +9,11 @@
 
 <div class="results">
 	{#each data.results as preset}
-		<PresetSearchResult {preset} authorName={data.authors[preset.author]} />
+		<PresetSearchResult
+			{preset}
+			authorName={data.authors[preset.author]}
+			stats={data.stats[preset.id]}
+		/>
 	{/each}
 </div>
 

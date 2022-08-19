@@ -1,5 +1,5 @@
 import PocketBase from 'pocketbase';
-import type { Preset } from '$lib/preset';
+import type { Preset, PresetStats } from '$lib/preset';
 
 const connect = () => {
 	return new PocketBase('http://127.0.0.1:8090');
@@ -16,10 +16,24 @@ export async function load({ url }: { url: URL }) {
 		thumbnail: item.thumbnail,
 		title: item.title,
 		author: item.author,
-		views: item.views,
 		created: new Date(item.created),
 		updated: new Date(item.updated)
 	}));
+
+	const stats: Record<string, PresetStats> = {};
+	for (const preset of results) {
+		const presetStatsRecords = await client.records.getFullList('preset_stats', undefined, {
+			filter: `preset~'${preset.id}'`
+		});
+		stats[preset.id] = presetStatsRecords
+			.map((record) => ({
+				views: record.views
+			}))
+			.reduce((agg, next) => {
+				agg.views += next.views;
+				return agg;
+			});
+	}
 
 	const authors: Record<string, string> = {};
 	for (const result of results) {
@@ -27,5 +41,5 @@ export async function load({ url }: { url: URL }) {
 		authors[result.author] = user.name;
 	}
 
-	return { results, authors, query };
+	return { results, authors, stats, query };
 }
