@@ -20,5 +20,11 @@ export async function load({ url }: { url: URL }) {
 		updated: new Date(item.updated)
 	}));
 
-	return { results, query };
+	const authors: Record<string, string> = {};
+	for (const result of results) {
+		const user = await client.records.getOne('profiles', result.author);
+		authors[result.author] = user.name;
+	}
+
+	return { results, authors, query };
 }

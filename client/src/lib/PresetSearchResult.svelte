@@ -2,6 +2,7 @@
 	import type { Preset } from './preset';
 
 	export let preset: Preset;
+	export let authorName: string;
 </script>
 
 <div class="result-entry">
@@ -9,7 +10,7 @@
 	<div class="info">
 		<div class="basic">
 			<span class="title"><a href={`/preset/${preset.id}`}>{preset.title}</a></span>
-			<span>By <a href={`/user/${preset.author}`}>karashiiro</a></span>
+			<span>By <a href={`/user/${preset.author}`}>{authorName}</a></span>
 		</div>
 		<div><small>Last updated: {preset.updated.toLocaleDateString()}</small></div>
 	</div>
