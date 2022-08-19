@@ -1,20 +1,21 @@
 <script lang="ts">
+	import PresetSearchResult from '$lib/PresetSearchResult.svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	console.log(data.results);
 </script>
 
-<div>
+<h1>Results for "{data.query}":</h1>
+
+<div class="results">
 	{#each data.results as preset}
-		<div>
-			<a href={`/preset/${preset.id}`}>{preset.title}</a>
-		</div>
+		<PresetSearchResult {preset} />
 	{/each}
 </div>
 
 <style lang="scss">
-	a {
+	* {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
 			'Open Sans', 'Helvetica Neue', sans-serif;
 	}

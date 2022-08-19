@@ -33,13 +33,12 @@
 	</a>
 	<div class="info">
 		<a href={url}><p class="title">{preset.title}</p></a>
-		<p class="author">By <a href={`/users/${preset.author}`}>{author?.name}</a></p>
+		<p class="author">By <a href={`/user/${preset.author}`}>{author?.name}</a></p>
 	</div>
 </div>
 
 <style lang="scss">
-	p,
-	a {
+	* {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
 			'Open Sans', 'Helvetica Neue', sans-serif;
 	}

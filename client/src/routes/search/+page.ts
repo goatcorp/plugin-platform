@@ -19,5 +19,5 @@ export async function load({ url }: { url: URL }) {
 		created: new Date(item.created)
 	}));
 
-	return { results };
+	return { results, query };
 }

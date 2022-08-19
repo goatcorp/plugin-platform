@@ -77,7 +77,7 @@
 </form>
 
 <style lang="scss">
-	input {
+	* {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
 			'Open Sans', 'Helvetica Neue', sans-serif;
 	}
