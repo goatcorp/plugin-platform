@@ -34,7 +34,12 @@
 
 <div>
 	<h1>Search</h1>
-	<a href="/search">Search</a>
+	<div>
+		<form method="get" action="/search">
+			<input type="search" placeholder="Search for presets..." name="q" />
+			<button>Search</button>
+		</form>
+	</div>
 </div>
 
 <div>
@@ -58,7 +63,9 @@
 	h1,
 	h2,
 	p,
-	a {
+	a,
+	input,
+	button {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
 			'Open Sans', 'Helvetica Neue', sans-serif;
 	}

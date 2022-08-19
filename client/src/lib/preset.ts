@@ -5,3 +5,9 @@ export interface Preset {
 	author: string;
 	created: Date;
 }
+
+export interface PresetData {
+	id: string;
+	preset: string;
+	data: string;
+}
