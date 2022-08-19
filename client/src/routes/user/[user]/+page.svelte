@@ -10,7 +10,7 @@
 <h2>Plugin presets</h2>
 <div>
 	{#each data.presets as preset}
-		<PresetRow {preset} authorName="" />
+		<PresetRow {preset} stats={data.presetStats[preset.id]} authorName="" />
 	{/each}
 </div>
 

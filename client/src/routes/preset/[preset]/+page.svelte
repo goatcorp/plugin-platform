@@ -9,6 +9,7 @@
 	<span>By <a href={`/user/${data.preset.author}`}>{data.authorName}</a></span>
 	<span>Created {data.preset.created.toLocaleDateString()}</span>
 	<span>Last updated {data.preset.updated.toLocaleDateString()}</span>
+	<span>{data.presetStats.views} views</span>
 </div>
 
 {#each data.presetData as presetDataEntry, i}
@@ -35,5 +36,6 @@
 	.preset-data {
 		padding: 10px;
 		background-color: #eee;
+		overflow-wrap: break-word;
 	}
 </style>

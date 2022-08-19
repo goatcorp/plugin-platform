@@ -1,5 +1,5 @@
 import PocketBase from 'pocketbase';
-import type { Preset, PresetData } from '$lib/preset';
+import type { Preset, PresetData, PresetStats } from '$lib/preset';
 
 const connect = () => {
 	return new PocketBase('http://127.0.0.1:8090');
@@ -19,15 +19,27 @@ export async function load({ params }: { params: Record<string, string> }) {
 		updated: new Date(presetRecord.updated)
 	};
 
-	const presetDataRecord = await client.records.getFullList('preset_data', undefined, {
+	const presetDataRecords = await client.records.getFullList('preset_data', undefined, {
 		filter: `preset~'${id}'`
 	});
-	const presetData: Omit<PresetData, 'preset' | 'id'>[] = presetDataRecord.map((record) => ({
+	const presetData: Omit<PresetData, 'preset' | 'id'>[] = presetDataRecords.map((record) => ({
 		data: record.data,
 		title: record.title
 	}));
 
+	const presetStatsRecords = await client.records.getFullList('preset_stats', undefined, {
+		filter: `preset~'${id}'`
+	});
+	const presetStats: PresetStats = presetStatsRecords
+		.map((record) => ({
+			views: record.views
+		}))
+		.reduce((agg, next) => {
+			agg.views += next.views;
+			return agg;
+		});
+
 	const authorName = (await client.records.getOne('profiles', preset.author)).name;
 
-	return { preset, presetData, authorName };
+	return { preset, presetData, presetStats, authorName };
 }

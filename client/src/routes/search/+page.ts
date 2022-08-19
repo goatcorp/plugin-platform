@@ -16,6 +16,7 @@ export async function load({ url }: { url: URL }) {
 		thumbnail: item.thumbnail,
 		title: item.title,
 		author: item.author,
+		views: item.views,
 		created: new Date(item.created),
 		updated: new Date(item.updated)
 	}));

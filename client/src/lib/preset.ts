@@ -13,3 +13,7 @@ export interface PresetData {
 	data: string;
 	title: string;
 }
+
+export interface PresetStats {
+	views: number;
+}

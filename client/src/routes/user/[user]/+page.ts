@@ -1,4 +1,4 @@
-import type { Preset } from '$lib/preset';
+import type { Preset, PresetStats } from '$lib/preset';
 import type { Profile } from '$lib/profile';
 import PocketBase from 'pocketbase';
 
@@ -24,9 +24,25 @@ export async function load({ params }: { params: Record<string, string> }) {
 		thumbnail: record.thumbnail,
 		title: record.title,
 		author: record.author,
+		views: record.views,
 		created: new Date(record.created),
 		updated: new Date(record.updated)
 	}));
 
-	return { profile, presets };
+	const presetStats: Record<string, PresetStats> = {};
+	for (const preset of presets) {
+		const presetStatsRecords = await client.records.getFullList('preset_stats', undefined, {
+			filter: `preset~'${preset.id}'`
+		});
+		presetStats[preset.id] = presetStatsRecords
+			.map((record) => ({
+				views: record.views
+			}))
+			.reduce((agg, next) => {
+				agg.views += next.views;
+				return agg;
+			});
+	}
+
+	return { profile, presets, presetStats };
 }

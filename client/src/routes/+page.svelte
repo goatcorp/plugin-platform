@@ -1,30 +1,8 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
-	import { onMount } from 'svelte';
-
-	import type { Preset } from '$lib/preset';
+	import type { PageData } from './$types';
 	import PresetCard from '$lib/PresetCard.svelte';
 
-	let presets: Preset[] = [];
-
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
-
-	onMount(async () => {
-		const client = connect();
-		const presetList = await client.records.getList('presets');
-		presets = presetList.items
-			.map((item) => ({
-				id: item.id,
-				thumbnail: item.thumbnail,
-				title: item.title,
-				author: item.author,
-				created: new Date(item.created),
-				updated: new Date(item.updated)
-			}))
-			.sort((a, b) => b.created.valueOf() - a.created.valueOf());
-	});
+	export let data: PageData;
 </script>
 
 <div>
@@ -47,15 +25,19 @@
 	<h1>Plugin presets</h1>
 	<a href="/presets">Go to all presets</a>
 	<h2>Popular</h2>
-	<!--Presets with a high absolute number of downloads-->
-	<div class="gallery" />
+	<!--Presets with a high absolute number of views-->
+	<div class="gallery">
+		{#each data.popular as preset}
+			<div class="wrapper"><PresetCard {preset} stats={{ views: preset.views }} /></div>
+		{/each}
+	</div>
 	<h2>Trending</h2>
 	<!--Presets with a high rate of growth over the past 24 hours-->
 	<div class="gallery" />
 	<h2>New</h2>
 	<div class="gallery">
-		{#each presets as preset}
-			<div class="wrapper"><PresetCard {preset} /></div>
+		{#each data.presets as preset}
+			<div class="wrapper"><PresetCard {preset} stats={data.presetStats[preset.id]} /></div>
 		{/each}
 	</div>
 </div>

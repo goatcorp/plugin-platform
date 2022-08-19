@@ -1,11 +1,13 @@
 <script lang="ts">
 	import PocketBase from 'pocketbase';
 	import { onMount } from 'svelte';
-	import type { Preset } from './preset';
+	import type { Preset, PresetStats } from './preset';
 	import type { Profile } from './profile';
 
 	export let preset: Preset;
-	const url = `/presets/${preset.id}`;
+	export let stats: PresetStats;
+
+	const url = `/preset/${preset.id}`;
 
 	let author: Profile | null = null;
 
@@ -28,9 +30,14 @@
 </script>
 
 <div class="preset-card">
-	<a href={url}>
-		<div class="thumbnail" />
-	</a>
+	<div class="preview">
+		<a href={url}>
+			<div class="thumbnail" />
+			<div class="views-wrapper">
+				<span class="views">{stats.views} views</span>
+			</div>
+		</a>
+	</div>
 	<div class="info">
 		<a href={url}><p class="title">{preset.title}</p></a>
 		<p class="author">By <a href={`/user/${preset.author}`}>{author?.name}</a></p>
@@ -55,12 +62,32 @@
 			padding-right: 10px;
 		}
 
-		.thumbnail {
+		.preview {
+			position: relative;
 			height: 60%;
 			width: 100%;
-			background-color: blue;
 
+			background-color: blue;
 			border-radius: 10px 10px 0 0;
+
+			.thumbnail {
+				height: 100%;
+			}
+		}
+
+		.views-wrapper {
+			position: absolute;
+			bottom: 10px;
+			right: 10px;
+			padding: 4px;
+
+			background-color: rgba(0.7, 0.7, 0.7, 0.6);
+			border-radius: 15px;
+		}
+
+		.views {
+			font-size: smaller;
+			color: white;
 		}
 	}
 </style>

@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { Preset } from './preset';
+	import type { Preset, PresetStats } from './preset';
 
 	export let preset: Preset;
+	export let stats: PresetStats;
 	export let authorName: string;
 </script>
 
@@ -14,7 +15,10 @@
 				<span>By <a href={`/user/${preset.author}`}>{authorName}</a></span>
 			{/if}
 		</div>
-		<div><small>Last updated: {preset.updated.toLocaleDateString()}</small></div>
+		<div class="extra">
+			<small>Last updated: {preset.updated.toLocaleDateString()}</small>
+			<small>{stats.views} views</small>
+		</div>
 	</div>
 </div>
 
@@ -54,6 +58,11 @@
 
 			.basic > * {
 				display: block;
+			}
+
+			.extra > * {
+				display: block;
+				text-align: right;
 			}
 
 			.title {
