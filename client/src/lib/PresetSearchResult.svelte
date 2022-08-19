@@ -11,7 +11,7 @@
 			<span class="title"><a href={`/preset/${preset.id}`}>{preset.title}</a></span>
 			<span>By <a href={`/user/${preset.author}`}>karashiiro</a></span>
 		</div>
-		<div><small>Last updated: {preset.created.toLocaleDateString()}</small></div>
+		<div><small>Last updated: {preset.updated.toLocaleDateString()}</small></div>
 	</div>
 </div>
 

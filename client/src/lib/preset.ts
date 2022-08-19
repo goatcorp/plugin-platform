@@ -4,6 +4,7 @@ export interface Preset {
 	title: string;
 	author: string;
 	created: Date;
+	updated: Date;
 }
 
 export interface PresetData {

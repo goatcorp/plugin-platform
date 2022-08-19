@@ -20,7 +20,8 @@
 				thumbnail: item.thumbnail,
 				title: item.title,
 				author: item.author,
-				created: new Date(item.created)
+				created: new Date(item.created),
+				updated: new Date(item.updated)
 			}))
 			.sort((a, b) => b.created.valueOf() - a.created.valueOf());
 	});
