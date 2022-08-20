@@ -43,6 +43,9 @@
 					<span class="title"><a href={url}>{preset.title}</a></span>
 				{/if}
 			</div>
+			{#if preset.spoiler}
+				<small>Spoiler</small>
+			{/if}
 			{#if authorName}
 				<span>By <a href={`/user/${preset.author}`}>{authorName}</a></span>
 			{/if}
