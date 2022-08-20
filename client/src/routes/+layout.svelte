@@ -41,7 +41,7 @@
 		{#if user == null}
 			<a href="/login">Log in</a>
 		{:else}
-			<a href={`/users/${user.profile?.id}`}>{user.profile?.name}</a>
+			<a href={`/user/${user.profile?.id}`}>{user.profile?.name}</a>
 		{/if}
 	</nav>
 </header>
