@@ -3,15 +3,88 @@
 	import { onDestroy, onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import { id } from '$lib/session';
+	import type { Tag } from '$lib/tags';
 
 	export let data: PageData;
 
 	let user: User | null = null;
 	let invalidate: (() => void) | null = null;
 	let isFavorite = data.isFavoriteInitial;
+	let tagOptions: Tag[] = [];
+	let tags: Tag[] = data.presetTags;
 
 	const connect = () => {
 		return new PocketBase('http://127.0.0.1:8090');
+	};
+
+	const getTags = async (q: string) => {
+		const client = connect();
+		const tags = await client.records.getList('tags', 1, 10, {
+			filter: `label~'${q}'`
+		});
+		return tags.items.map((record) => ({ id: record.id, label: record.label }));
+	};
+
+	const searchTags = async (q: string) => {
+		try {
+			tagOptions = (await getTags(q)).filter(
+				(tag) => !data.presetTags.map((t) => t.id).includes(tag.id)
+			);
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
+	const addTag = async (tagId: string) => {
+		const tag = tagOptions.find((t) => t.id === tagId);
+		if (tag == null) {
+			return;
+		}
+
+		const client = connect();
+		try {
+			await client.records.create('preset_tags', {
+				preset: data.preset.id,
+				tag: tag.id
+			});
+			tags.push(tag);
+			tags = tags; // Force reactivity
+
+			const optionIndex = tagOptions.findIndex((tag) => tag.id === tagId);
+			if (optionIndex !== -1) {
+				tagOptions.splice(optionIndex, 1);
+				tagOptions = tagOptions; // Force reactivity
+			}
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
+	const removeTag = async (tagId: string) => {
+		const tag = tags.find((t) => t.id === tagId);
+		if (tag == null) {
+			return;
+		}
+
+		const client = connect();
+		try {
+			const relation = await client.records.getList('preset_tags', 1, 1, {
+				filter: `preset='${data.preset.id}' && tag='${tagId}'`
+			});
+			if (relation.items.length === 0) {
+				console.error('No such tag found.');
+				return;
+			}
+
+			await client.records.delete('preset_tags', relation.items[0].id);
+			tags.splice(
+				tags.findIndex((tag) => tag.id === tagId),
+				1
+			);
+			tags = tags; // Force reactivity
+		} catch (err) {
+			console.error(err);
+		}
 	};
 
 	const toggleFavorite = async () => {
@@ -81,9 +154,35 @@
 	<button on:click={toggleFavorite}
 		>{isFavorite ? 'Remove from favorites' : 'Add to favorites'}</button
 	>
+
 	{#if user?.profile?.id === data.preset.author}
 		<a href={`/preset/${data.preset.id}/edit`}>Edit preset</a>
+		<div>
+			<input
+				type="text"
+				style="display: block;"
+				on:keyup={(e) => searchTags(e.currentTarget.value)}
+			/>
+			<select style="display: block;">
+				{#each tagOptions as tag}
+					<option value={tag.id} on:click={() => addTag(tag.id)}>{tag.label}</option>
+				{/each}
+			</select>
+		</div>
 	{/if}
+
+	<div>
+		<h2>Tags</h2>
+		{#each tags as tag}
+			<div style="display: flex;">
+				<button on:click={() => removeTag(tag.id)}>Remove</button>
+				<div class="tag">{tag.label}</div>
+			</div>
+		{/each}
+		{#if tags.length === 0}
+			<span>No tags.</span>
+		{/if}
+	</div>
 </div>
 
 {#each data.presetData as presetDataEntry, i}

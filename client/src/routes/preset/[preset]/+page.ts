@@ -1,6 +1,7 @@
 import PocketBase from 'pocketbase';
 import type { Preset, PresetData, PresetStats } from '$lib/preset';
 import type { PageLoad } from './$types';
+import type { Tag } from '$lib/tags';
 
 const connect = () => {
 	return new PocketBase('http://127.0.0.1:8090');
@@ -45,6 +46,17 @@ export const load: PageLoad = async ({ params }) => {
 			}
 		);
 
+	const presetTagRelations = (
+		await client.records.getFullList('preset_tags', undefined, {
+			filter: `preset='${preset.id}'`
+		})
+	).map((presetTag) => ({ preset: presetTag.preset, tag: presetTag.tag }));
+	const presetTags: Tag[] = [];
+	for (const tag of presetTagRelations) {
+		const presetTag = await client.records.getOne('tags', tag.tag);
+		presetTags.push(presetTag);
+	}
+
 	const isFavoriteInitial =
 		(
 			await client.records.getList('user_preset_favorites', 1, 1, {
@@ -54,5 +66,5 @@ export const load: PageLoad = async ({ params }) => {
 
 	const authorName = (await client.records.getOne('profiles', preset.author)).name;
 
-	return { preset, presetData, presetStats, authorName, isFavoriteInitial };
+	return { preset, presetData, presetStats, presetTags, authorName, isFavoriteInitial };
 };
