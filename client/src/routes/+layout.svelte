@@ -41,6 +41,7 @@
 		{#if user == null}
 			<a href="/login">Log in</a>
 		{:else}
+			<a href="/create">Create</a>
 			<a href={`/user/${user.profile?.id}`}>{user.profile?.name}</a>
 		{/if}
 	</nav>
@@ -57,6 +58,10 @@
 		nav {
 			display: flex;
 			justify-content: right;
+
+			> * {
+				margin-left: 8px;
+			}
 		}
 	}
 
