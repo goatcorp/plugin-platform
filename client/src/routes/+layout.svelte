@@ -54,6 +54,7 @@
 			{:else}
 				<a href="/logout">Log out</a>
 				<a href="/create">Create</a>
+				<a href="/settings">Settings</a>
 				<a href={`/user/${user.profile?.id}`}>{user.profile?.name}</a>
 			{/if}
 		</div>

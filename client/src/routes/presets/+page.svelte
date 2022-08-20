@@ -1,18 +1,29 @@
 <script lang="ts">
-	import PresetSearchResult from '$lib/PresetRow.svelte';
+	import PresetRow from '$lib/PresetRow.svelte';
+	import { id } from '$lib/session';
+	import { getSettings } from '$lib/settings';
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+
+	let showSpoilers = false;
+
+	onMount(async () => {
+		const settings = await getSettings($id);
+		showSpoilers = settings.show_spoilers;
+	});
 </script>
 
 <h1>All presets</h1>
 
 <div>
 	{#each data.presets as preset}
-		<PresetSearchResult
+		<PresetRow
 			{preset}
 			authorName={data.authors[preset.author]}
 			stats={data.stats[preset.id]}
+			{showSpoilers}
 		/>
 	{/each}
 </div>

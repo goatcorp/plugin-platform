@@ -29,6 +29,7 @@ export const load: PageLoad = async ({ url, params }) => {
 			thumbnail: preset.thumbnail,
 			title: preset.title,
 			author: preset.author,
+			spoiler: preset.spoiler,
 			created: new Date(preset.created),
 			updated: new Date(preset.updated)
 		});

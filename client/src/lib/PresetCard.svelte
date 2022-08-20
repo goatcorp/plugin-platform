@@ -1,9 +1,13 @@
 <script lang="ts">
+	import { id } from '$lib/session';
+	import { onMount } from 'svelte';
 	import type { Preset, PresetStats } from './preset';
+	import { getSettings } from './settings';
 
 	export let preset: Preset;
 	export let stats: PresetStats;
 	export let authorName: string;
+	export let showSpoilers = false;
 
 	const url = `/preset/${preset.id}`;
 
@@ -20,11 +24,16 @@
 		await new Promise((resolve) => setTimeout(resolve, 100));
 		spoilerEnabled = false;
 	};
+
+	onMount(async () => {
+		const settings = await getSettings($id);
+		showSpoilers = settings.show_spoilers;
+	});
 </script>
 
 <div class="preset-card">
 	<div class="preview">
-		{#if spoilerEnabled}
+		{#if !showSpoilers && spoilerEnabled}
 			<div class="spoiler-overlay" on:click={(e) => dismissSpoiler(e.currentTarget)} />
 		{/if}
 		<a href={url}>
@@ -40,7 +49,7 @@
 		</div>
 	</div>
 	<div class="info">
-		{#if spoilerEnabled}
+		{#if !showSpoilers && spoilerEnabled}
 			<span
 				class="title spoiler-overlay-text"
 				on:click={(e) => dismissSpoilerText(e.currentTarget)}

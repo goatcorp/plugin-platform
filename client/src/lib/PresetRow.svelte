@@ -4,6 +4,7 @@
 	export let preset: Preset;
 	export let stats: PresetStats;
 	export let authorName: string;
+	export let showSpoilers = false;
 
 	const url = `/preset/${preset.id}`;
 
@@ -24,7 +25,7 @@
 
 <div class="result-entry">
 	<div style="position: relative;">
-		{#if spoilerEnabled}
+		{#if !showSpoilers && spoilerEnabled}
 			<div class="spoiler-overlay" on:click={(e) => dismissSpoiler(e.currentTarget)} />
 		{/if}
 		<a href={url}><div class="thumbnail" /></a>
@@ -32,7 +33,7 @@
 	<div class="info">
 		<div class="basic">
 			<div style="position: relative;">
-				{#if spoilerEnabled}
+				{#if !showSpoilers && spoilerEnabled}
 					<span
 						class="title spoiler-overlay-text"
 						on:click={(e) => dismissSpoilerText(e.currentTarget)}

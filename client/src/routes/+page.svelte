@@ -1,8 +1,18 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import PresetCard from '$lib/PresetCard.svelte';
+	import { onMount } from 'svelte';
+	import { id } from '$lib/session';
+	import { getSettings } from '$lib/settings';
 
 	export let data: PageData;
+
+	let showSpoilers = false;
+
+	onMount(async () => {
+		const settings = await getSettings($id);
+		showSpoilers = settings.show_spoilers;
+	});
 </script>
 
 <div>
@@ -33,6 +43,7 @@
 					{preset}
 					stats={data.stats[preset.id]}
 					authorName={data.authors[preset.author]}
+					{showSpoilers}
 				/>
 			</div>
 		{/each}
@@ -46,6 +57,7 @@
 					{preset}
 					stats={data.stats[preset.id]}
 					authorName={data.authors[preset.author]}
+					{showSpoilers}
 				/>
 			</div>
 		{/each}
@@ -58,6 +70,7 @@
 					{preset}
 					stats={data.stats[preset.id]}
 					authorName={data.authors[preset.author]}
+					{showSpoilers}
 				/>
 			</div>
 		{/each}
