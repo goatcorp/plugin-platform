@@ -40,6 +40,14 @@
 	<nav>
 		<div><a href="/">Dalamud Plugin Presets</a></div>
 		<div class="controls">
+			<div class="search">
+				<div>
+					<form method="get" action="/search">
+						<input type="search" placeholder="Search for presets..." name="q" />
+						<button>Search</button>
+					</form>
+				</div>
+			</div>
 			{#if user == null}
 				<a href="/login">Log in</a>
 			{:else}
@@ -62,8 +70,17 @@
 			display: flex;
 			justify-content: space-between;
 
-			.controls > * {
-				margin-left: 8px;
+			.controls {
+				display: flex;
+				justify-content: right;
+
+				> * {
+					margin-left: 8px;
+				}
+			}
+
+			.search {
+				display: flex;
 			}
 		}
 	}
@@ -73,7 +90,7 @@
 		margin: auto;
 	}
 
-	a {
+	* {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
 			'Open Sans', 'Helvetica Neue', sans-serif;
 	}
