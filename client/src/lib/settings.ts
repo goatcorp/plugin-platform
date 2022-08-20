@@ -12,10 +12,12 @@ export async function getSettings(userId?: string | null | undefined): Promise<S
 			show_spoilers: false
 		};
 
-		try {
-			await client.records.create('user_settings', { ...newSettings, user: userId });
-		} catch (err) {
-			console.error(err);
+		if (userId != null) {
+			try {
+				await client.records.create('user_settings', { ...newSettings, user: userId });
+			} catch (err) {
+				console.error(err);
+			}
 		}
 
 		return newSettings;
