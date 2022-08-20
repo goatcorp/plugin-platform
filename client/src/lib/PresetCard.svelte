@@ -1,32 +1,11 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
-	import { onMount } from 'svelte';
 	import type { Preset, PresetStats } from './preset';
-	import type { Profile } from './profile';
 
 	export let preset: Preset;
 	export let stats: PresetStats;
+	export let authorName: string;
 
 	const url = `/preset/${preset.id}`;
-
-	let author: Profile | null = null;
-
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
-
-	const fetchAuthor = async () => {
-		const client = connect();
-		const authorRecord = await client.records.getOne('profiles', preset.author);
-		author = {
-			name: authorRecord.name,
-			avatar: authorRecord.avatar
-		};
-	};
-
-	onMount(async () => {
-		await fetchAuthor();
-	});
 </script>
 
 <div class="preset-card">
@@ -40,7 +19,7 @@
 	</div>
 	<div class="info">
 		<a href={url}><p class="title">{preset.title}</p></a>
-		<p class="author">By <a href={`/user/${preset.author}`}>{author?.name}</a></p>
+		<p class="author">By <a href={`/user/${preset.author}`}>{authorName}</a></p>
 	</div>
 </div>
 

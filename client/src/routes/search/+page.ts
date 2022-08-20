@@ -29,10 +29,15 @@ export async function load({ url }: { url: URL }) {
 			.map((record) => ({
 				views: record.views
 			}))
-			.reduce((agg, next) => {
-				agg.views += next.views;
-				return agg;
-			});
+			.reduce(
+				(agg, next) => {
+					agg.views += next.views;
+					return agg;
+				},
+				{
+					views: 0
+				}
+			);
 	}
 
 	const authors: Record<string, string> = {};

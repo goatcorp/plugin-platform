@@ -38,10 +38,15 @@ export async function load({ params }: { params: Record<string, string> }) {
 			.map((record) => ({
 				views: record.views
 			}))
-			.reduce((agg, next) => {
-				agg.views += next.views;
-				return agg;
-			});
+			.reduce(
+				(agg, next) => {
+					agg.views += next.views;
+					return agg;
+				},
+				{
+					views: 0
+				}
+			);
 	}
 
 	return { profile, presets, presetStats };

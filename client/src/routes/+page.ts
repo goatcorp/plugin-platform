@@ -22,17 +22,28 @@ const getNewPresets = async (client: PocketBase) => {
 
 const getPopularPresets = async (client: PocketBase) => {
 	const presetList: (Preset & PresetStats)[] = await client.send('/api/presets/popular', {});
-	const presets = presetList
-		.map((item) => ({
-			id: item.id,
-			thumbnail: item.thumbnail,
-			title: item.title,
-			author: item.author,
-			views: item.views,
-			created: new Date(item.created),
-			updated: new Date(item.updated)
-		}))
-		.sort((a, b) => b.views - a.views);
+	const presets = presetList.map((item) => ({
+		id: item.id,
+		thumbnail: item.thumbnail,
+		title: item.title,
+		author: item.author,
+		views: item.views,
+		created: new Date(item.created),
+		updated: new Date(item.updated)
+	}));
+	return presets;
+};
+
+const getTrendingPresets = async (client: PocketBase) => {
+	const presetList: Preset[] = await client.send('/api/presets/trending', {});
+	const presets = presetList.map((item) => ({
+		id: item.id,
+		thumbnail: item.thumbnail,
+		title: item.title,
+		author: item.author,
+		created: new Date(item.created),
+		updated: new Date(item.updated)
+	}));
 	return presets;
 };
 
@@ -41,21 +52,31 @@ export async function load() {
 
 	const presets: Preset[] = await getNewPresets(client);
 	const popular: (Preset & PresetStats)[] = await getPopularPresets(client);
+	const trending: Preset[] = await getTrendingPresets(client);
 
-	const presetStats: Record<string, PresetStats> = {};
-	for (const preset of presets) {
-		const presetStatsRecords = await client.records.getFullList('preset_stats', undefined, {
+	const stats: Record<string, PresetStats> = {};
+	const authors: Record<string, string> = {};
+	for (const preset of presets.concat(popular).concat(trending)) {
+		const statsRecords = await client.records.getFullList('preset_stats', undefined, {
 			filter: `preset~'${preset.id}'`
 		});
-		presetStats[preset.id] = presetStatsRecords
+		stats[preset.id] = statsRecords
 			.map((record) => ({
 				views: record.views
 			}))
-			.reduce((agg, next) => {
-				agg.views += next.views;
-				return agg;
-			});
+			.reduce(
+				(agg, next) => {
+					agg.views += next.views;
+					return agg;
+				},
+				{
+					views: 0
+				}
+			);
+
+		const user = await client.records.getOne('profiles', preset.author);
+		authors[preset.author] = user.name;
 	}
 
-	return { presets, popular, presetStats };
+	return { presets, popular, trending, stats, authors };
 }

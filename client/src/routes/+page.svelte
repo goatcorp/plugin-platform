@@ -28,16 +28,38 @@
 	<!--Presets with a high absolute number of views-->
 	<div class="gallery">
 		{#each data.popular as preset}
-			<div class="wrapper"><PresetCard {preset} stats={{ views: preset.views }} /></div>
+			<div class="wrapper">
+				<PresetCard
+					{preset}
+					stats={data.stats[preset.id]}
+					authorName={data.authors[preset.author]}
+				/>
+			</div>
 		{/each}
 	</div>
 	<h2>Trending</h2>
 	<!--Presets with a high rate of growth over the past 24 hours-->
-	<div class="gallery" />
+	<div class="gallery">
+		{#each data.trending as preset}
+			<div class="wrapper">
+				<PresetCard
+					{preset}
+					stats={data.stats[preset.id]}
+					authorName={data.authors[preset.author]}
+				/>
+			</div>
+		{/each}
+	</div>
 	<h2>New</h2>
 	<div class="gallery">
 		{#each data.presets as preset}
-			<div class="wrapper"><PresetCard {preset} stats={data.presetStats[preset.id]} /></div>
+			<div class="wrapper">
+				<PresetCard
+					{preset}
+					stats={data.stats[preset.id]}
+					authorName={data.authors[preset.author]}
+				/>
+			</div>
 		{/each}
 	</div>
 </div>
