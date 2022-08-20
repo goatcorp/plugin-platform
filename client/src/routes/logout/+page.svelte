@@ -2,6 +2,7 @@
 	import PocketBase from 'pocketbase';
 	import { goto } from '$app/navigation';
 	import { id } from '$lib/session';
+	import { onMount } from 'svelte';
 
 	const connect = () => {
 		return new PocketBase('http://127.0.0.1:8090');
@@ -18,7 +19,9 @@
 		}
 	};
 
-	logout();
+	onMount(async () => {
+		await logout();
+	});
 </script>
 
 <p>Redirecting...</p>
