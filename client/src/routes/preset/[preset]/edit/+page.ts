@@ -23,7 +23,8 @@ export const load: PageLoad = async ({ params }) => {
 	const presetDataRecords = await client.records.getFullList('preset_data', undefined, {
 		filter: `preset~'${id}'`
 	});
-	const presetData: Omit<PresetData, 'preset' | 'id'>[] = presetDataRecords.map((record) => ({
+	const presetData: Omit<PresetData, 'preset'>[] = presetDataRecords.map((record) => ({
+		id: record.id,
 		data: record.data,
 		title: record.title
 	}));
@@ -45,14 +46,7 @@ export const load: PageLoad = async ({ params }) => {
 			}
 		);
 
-	const isFavoriteInitial =
-		(
-			await client.records.getList('user_preset_favorites', 1, 1, {
-				filter: `preset='${preset.id}'`
-			})
-		).totalItems !== 0;
-
 	const authorName = (await client.records.getOne('profiles', preset.author)).name;
 
-	return { preset, presetData, presetStats, authorName, isFavoriteInitial };
+	return { preset, presetData, presetStats, authorName };
 };

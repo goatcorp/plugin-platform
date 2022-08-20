@@ -1,10 +1,13 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
+	import PocketBase, { type User } from 'pocketbase';
+	import { onDestroy, onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import { id } from '$lib/session';
 
 	export let data: PageData;
 
+	let user: User | null = null;
+	let invalidate: (() => void) | null = null;
 	let isFavorite = data.isFavoriteInitial;
 
 	const connect = () => {
@@ -42,6 +45,31 @@
 			console.error(err);
 		}
 	};
+
+	// This should be a store
+	const loadCurrentUser = async () => {
+		const client = connect();
+		if (!client.authStore.isValid || $id == null) {
+			user = null;
+			return;
+		}
+
+		user = await client.users.getOne($id);
+	};
+
+	onMount(async () => {
+		invalidate = id.subscribe(async () => {
+			await loadCurrentUser();
+		});
+
+		await loadCurrentUser();
+	});
+
+	onDestroy(() => {
+		if (invalidate != null) {
+			invalidate();
+		}
+	});
 </script>
 
 <h1>{data.preset.title}</h1>
@@ -53,6 +81,9 @@
 	<button on:click={toggleFavorite}
 		>{isFavorite ? 'Remove from favorites' : 'Add to favorites'}</button
 	>
+	{#if user?.profile?.id === data.preset.author}
+		<a href={`/preset/${data.preset.id}/edit`}>Edit preset</a>
+	{/if}
 </div>
 
 {#each data.presetData as presetDataEntry, i}
