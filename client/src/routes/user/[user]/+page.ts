@@ -19,15 +19,17 @@ export async function load({ params }: { params: Record<string, string> }) {
 	const presetRecords = await client.records.getFullList('presets', undefined, {
 		filter: `author='${id}'`
 	});
-	const presets: Preset[] = presetRecords.map((record) => ({
-		id: record.id,
-		thumbnail: record.thumbnail,
-		title: record.title,
-		author: record.author,
-		views: record.views,
-		created: new Date(record.created),
-		updated: new Date(record.updated)
-	}));
+	const presets: Preset[] = presetRecords
+		.map((record) => ({
+			id: record.id,
+			thumbnail: record.thumbnail,
+			title: record.title,
+			author: record.author,
+			views: record.views,
+			created: new Date(record.created),
+			updated: new Date(record.updated)
+		}))
+		.sort((a, b) => b.created.valueOf() - a.created.valueOf());
 
 	const presetStats: Record<string, PresetStats> = {};
 	for (const preset of presets) {
