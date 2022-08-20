@@ -25,6 +25,7 @@ func main() {
 					Thumbnail string `json:"thumbnail"`
 					Title     string `json:"title"`
 					Author    string `json:"author"`
+					Spoiler   bool   `json:"spoiler"`
 					Created   string `json:"created"`
 					Updated   string `json:"updated"`
 					Views     int64  `json:"views"`
@@ -54,6 +55,7 @@ func main() {
 					Thumbnail string `json:"thumbnail"`
 					Title     string `json:"title"`
 					Author    string `json:"author"`
+					Spoiler   bool   `json:"spoiler"`
 					Created   string `json:"created"`
 					Updated   string `json:"updated"`
 				}

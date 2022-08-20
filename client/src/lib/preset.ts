@@ -3,6 +3,7 @@ export interface Preset {
 	thumbnail: string | null;
 	title: string;
 	author: string;
+	spoiler: boolean;
 	created: Date;
 	updated: Date;
 }

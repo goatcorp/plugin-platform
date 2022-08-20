@@ -13,6 +13,7 @@ const getNewPresets = async (client: PocketBase) => {
 			thumbnail: item.thumbnail,
 			title: item.title,
 			author: item.author,
+			spoiler: item.spoiler,
 			created: new Date(item.created),
 			updated: new Date(item.updated)
 		}))
@@ -27,6 +28,7 @@ const getPopularPresets = async (client: PocketBase) => {
 		thumbnail: item.thumbnail,
 		title: item.title,
 		author: item.author,
+		spoiler: item.spoiler,
 		views: item.views,
 		created: new Date(item.created),
 		updated: new Date(item.updated)
@@ -41,6 +43,7 @@ const getTrendingPresets = async (client: PocketBase) => {
 		thumbnail: item.thumbnail,
 		title: item.title,
 		author: item.author,
+		spoiler: item.spoiler,
 		created: new Date(item.created),
 		updated: new Date(item.updated)
 	}));

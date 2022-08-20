@@ -4,13 +4,45 @@
 	export let preset: Preset;
 	export let stats: PresetStats;
 	export let authorName: string;
+
+	const url = `/preset/${preset.id}`;
+
+	let spoilerEnabled = preset.spoiler;
+
+	const dismissSpoiler = async (target: Element) => {
+		target.setAttribute('style', 'blur: none;');
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		spoilerEnabled = false;
+	};
+
+	const dismissSpoilerText = async (target: Element) => {
+		target.setAttribute('style', 'blur: none;');
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		spoilerEnabled = false;
+	};
 </script>
 
 <div class="result-entry">
-	<a href={`/preset/${preset.id}`}><div class="thumbnail" /></a>
+	<div style="position: relative;">
+		{#if spoilerEnabled}
+			<div class="spoiler-overlay" on:click={(e) => dismissSpoiler(e.currentTarget)} />
+		{/if}
+		<a href={url}><div class="thumbnail" /></a>
+	</div>
 	<div class="info">
 		<div class="basic">
-			<span class="title"><a href={`/preset/${preset.id}`}>{preset.title}</a></span>
+			<div style="position: relative;">
+				{#if spoilerEnabled}
+					<span
+						class="title spoiler-overlay-text"
+						on:click={(e) => dismissSpoilerText(e.currentTarget)}
+					>
+						<a href={url} disabled>{preset.title}</a>
+					</span>
+				{:else}
+					<span class="title"><a href={url}>{preset.title}</a></span>
+				{/if}
+			</div>
 			{#if authorName}
 				<span>By <a href={`/user/${preset.author}`}>{authorName}</a></span>
 			{/if}
@@ -32,6 +64,10 @@
 		color: #444;
 	}
 
+	a[disabled] {
+		pointer-events: none;
+	}
+
 	.result-entry {
 		display: flex;
 
@@ -47,6 +83,23 @@
 			background-color: blue;
 
 			border-radius: 10px 0 0 10px;
+		}
+
+		.spoiler-overlay {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			filter: blur(1.5rem);
+			cursor: pointer;
+
+			animation-duration: 100ms;
+		}
+
+		.spoiler-overlay-text {
+			filter: blur(4px);
+			cursor: pointer;
+
+			animation-duration: 100ms;
 		}
 
 		.info {

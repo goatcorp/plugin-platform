@@ -17,6 +17,7 @@ export const load: PageLoad = async ({ params }) => {
 		thumbnail: presetRecord.thumbnail,
 		title: presetRecord.title,
 		author: presetRecord.author,
+		spoiler: presetRecord.spoiler,
 		created: new Date(presetRecord.created),
 		updated: new Date(presetRecord.updated)
 	};
@@ -54,7 +55,7 @@ export const load: PageLoad = async ({ params }) => {
 	const presetTags: Tag[] = [];
 	for (const tag of presetTagRelations) {
 		const presetTag = await client.records.getOne('tags', tag.tag);
-		presetTags.push(presetTag);
+		presetTags.push({ id: presetTag.id, label: presetTag.label });
 	}
 
 	const isFavoriteInitial =

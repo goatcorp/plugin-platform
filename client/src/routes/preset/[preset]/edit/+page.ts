@@ -16,6 +16,7 @@ export const load: PageLoad = async ({ params }) => {
 		thumbnail: presetRecord.thumbnail,
 		title: presetRecord.title,
 		author: presetRecord.author,
+		spoiler: presetRecord.spoiler,
 		created: new Date(presetRecord.created),
 		updated: new Date(presetRecord.updated)
 	};

@@ -16,6 +16,7 @@ export const load: PageLoad = async ({ url }) => {
 		thumbnail: item.thumbnail,
 		title: item.title,
 		author: item.author,
+		spoiler: item.spoiler,
 		created: new Date(item.created),
 		updated: new Date(item.updated)
 	}));

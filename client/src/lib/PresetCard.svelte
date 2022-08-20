@@ -6,10 +6,27 @@
 	export let authorName: string;
 
 	const url = `/preset/${preset.id}`;
+
+	let spoilerEnabled = preset.spoiler;
+
+	const dismissSpoiler = async (target: Element) => {
+		target.setAttribute('style', 'blur: none;');
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		spoilerEnabled = false;
+	};
+
+	const dismissSpoilerText = async (target: Element) => {
+		target.setAttribute('style', 'blur: none;');
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		spoilerEnabled = false;
+	};
 </script>
 
 <div class="preset-card">
 	<div class="preview">
+		{#if spoilerEnabled}
+			<div class="spoiler-overlay" on:click={(e) => dismissSpoiler(e.currentTarget)} />
+		{/if}
 		<a href={url}>
 			<div class="thumbnail" />
 			<div class="views-wrapper">
@@ -18,7 +35,16 @@
 		</a>
 	</div>
 	<div class="info">
-		<a href={url}><p class="title">{preset.title}</p></a>
+		{#if spoilerEnabled}
+			<span
+				class="title spoiler-overlay-text"
+				on:click={(e) => dismissSpoilerText(e.currentTarget)}
+			>
+				<a href={url} disabled>{preset.title}</a>
+			</span>
+		{:else}
+			<span class="title"><a href={url}>{preset.title}</a></span>
+		{/if}
 		<p class="author">By <a href={`/user/${preset.author}`}>{authorName}</a></p>
 	</div>
 </div>
@@ -27,6 +53,10 @@
 	* {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
 			'Open Sans', 'Helvetica Neue', sans-serif;
+	}
+
+	a[disabled] {
+		pointer-events: none;
 	}
 
 	.preset-card {
@@ -39,6 +69,13 @@
 		.info {
 			padding-left: 10px;
 			padding-right: 10px;
+
+			.spoiler-overlay-text {
+				filter: blur(4px);
+				cursor: pointer;
+
+				animation-duration: 100ms;
+			}
 		}
 
 		.preview {
@@ -51,6 +88,16 @@
 
 			.thumbnail {
 				height: 100%;
+			}
+
+			.spoiler-overlay {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				filter: blur(1.5rem);
+				cursor: pointer;
+
+				animation-duration: 100ms;
 			}
 		}
 

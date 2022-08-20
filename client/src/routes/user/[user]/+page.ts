@@ -26,6 +26,7 @@ export async function load({ params }: { params: Record<string, string> }) {
 			thumbnail: record.thumbnail,
 			title: record.title,
 			author: record.author,
+			spoiler: record.spoiler,
 			created: new Date(record.created),
 			updated: new Date(record.updated)
 		}))
