@@ -15,6 +15,7 @@
 	const loadCurrentUser = async () => {
 		const client = connect();
 		if (!client.authStore.isValid || $id == null) {
+			user = null;
 			return;
 		}
 
@@ -51,6 +52,7 @@
 			{#if user == null}
 				<a href="/login">Log in</a>
 			{:else}
+				<a href="/logout">Log out</a>
 				<a href="/create">Create</a>
 				<a href={`/user/${user.profile?.id}`}>{user.profile?.name}</a>
 			{/if}

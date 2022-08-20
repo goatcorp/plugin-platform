@@ -1,6 +1,7 @@
 <script lang="ts">
 	import PocketBase from 'pocketbase';
 	import { id } from '$lib/session';
+	import { goto } from '$app/navigation';
 
 	let email: string = '';
 	let password: string = '';
@@ -21,7 +22,12 @@
 		try {
 			const userAuth = await client.users.authViaEmail(email, password);
 			$id = userAuth.user.id;
-			console.log('Logged in');
+
+			try {
+				await goto('/');
+			} catch (err) {
+				console.error(err);
+			}
 		} catch (err) {
 			console.error(err);
 		}
