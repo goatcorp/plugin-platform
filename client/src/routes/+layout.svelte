@@ -38,12 +38,15 @@
 
 <header>
 	<nav>
-		{#if user == null}
-			<a href="/login">Log in</a>
-		{:else}
-			<a href="/create">Create</a>
-			<a href={`/user/${user.profile?.id}`}>{user.profile?.name}</a>
-		{/if}
+		<div><a href="/">Dalamud Plugin Presets</a></div>
+		<div class="controls">
+			{#if user == null}
+				<a href="/login">Log in</a>
+			{:else}
+				<a href="/create">Create</a>
+				<a href={`/user/${user.profile?.id}`}>{user.profile?.name}</a>
+			{/if}
+		</div>
 	</nav>
 </header>
 
@@ -57,9 +60,9 @@
 
 		nav {
 			display: flex;
-			justify-content: right;
+			justify-content: space-between;
 
-			> * {
+			.controls > * {
 				margin-left: 8px;
 			}
 		}
