@@ -5,14 +5,18 @@
 	export let data: PageData;
 </script>
 
-<h1>{data.profile.name}</h1>
+<h1>Favorite presets</h1>
 
-<a href={`/user/${data.profile.id}/favorites/presets`}>Favorites</a>
+<span>Back to <a href={`/user/${data.profile.id}`}>{data.profile.name}</a></span>
+<div class="gap" />
 
-<h2>Plugin presets</h2>
 <div>
 	{#each data.presets as preset}
-		<PresetRow {preset} stats={data.presetStats[preset.id]} authorName="" />
+		<PresetRow
+			{preset}
+			authorName={data.presetAuthors[preset.author]}
+			stats={data.presetStats[preset.id]}
+		/>
 	{/each}
 </div>
 
@@ -20,5 +24,9 @@
 	* {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
 			'Open Sans', 'Helvetica Neue', sans-serif;
+	}
+
+	.gap {
+		height: 15px;
 	}
 </style>

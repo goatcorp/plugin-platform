@@ -17,19 +17,25 @@ export async function load({ params }: { params: Record<string, string> }) {
 		avatar: profileRecord.avatar
 	};
 
-	const presetRecords = await client.records.getFullList('presets', undefined, {
-		filter: `author='${id}'`
-	});
-	const presets: Preset[] = presetRecords
-		.map((record) => ({
-			id: record.id,
-			thumbnail: record.thumbnail,
-			title: record.title,
-			author: record.author,
-			created: new Date(record.created),
-			updated: new Date(record.updated)
-		}))
-		.sort((a, b) => b.created.valueOf() - a.created.valueOf());
+	const favorites = await client.records.getFullList('user_preset_favorites');
+	const presets: Preset[] = [];
+	for (const favorite of favorites) {
+		const preset = await client.records.getOne('presets', favorite.preset);
+		presets.push({
+			id: preset.id,
+			thumbnail: preset.thumbnail,
+			title: preset.title,
+			author: preset.author,
+			created: new Date(preset.created),
+			updated: new Date(preset.updated)
+		});
+	}
+
+	const presetAuthors: Record<string, string> = {};
+	for (const preset of presets) {
+		const author = await client.records.getOne('profiles', preset.author);
+		presetAuthors[preset.author] = author.name;
+	}
 
 	const presetStats: Record<string, PresetStats> = {};
 	for (const preset of presets) {
@@ -51,5 +57,5 @@ export async function load({ params }: { params: Record<string, string> }) {
 			);
 	}
 
-	return { profile, presets, presetStats };
+	return { profile, presets, presetAuthors, presetStats };
 }
