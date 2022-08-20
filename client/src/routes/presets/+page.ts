@@ -5,7 +5,7 @@ const connect = () => {
 	return new PocketBase('http://127.0.0.1:8090');
 };
 
-export async function load({ url }: { url: URL }) {
+export async function load() {
 	const client = connect();
 	const records = await client.records.getList('presets', 1);
 	const presets: Preset[] = records.items.map((item) => ({

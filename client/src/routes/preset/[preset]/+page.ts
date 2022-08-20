@@ -44,7 +44,14 @@ export async function load({ params }: { params: Record<string, string> }) {
 			}
 		);
 
+	const isFavoriteInitial =
+		(
+			await client.records.getList('user_preset_favorites', 1, 1, {
+				filter: `preset='${preset.id}'`
+			})
+		).totalItems !== 0;
+
 	const authorName = (await client.records.getOne('profiles', preset.author)).name;
 
-	return { preset, presetData, presetStats, authorName };
+	return { preset, presetData, presetStats, authorName, isFavoriteInitial };
 }
