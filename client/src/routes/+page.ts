@@ -50,9 +50,9 @@ const getTrendingPresets = async (client: PocketBase) => {
 export async function load() {
 	const client = connect();
 
-	const presets: Preset[] = (await getNewPresets(client)).slice(0, 8);
-	const popular: (Preset & PresetStats)[] = (await getPopularPresets(client)).slice(0, 8);
-	const trending: Preset[] = (await getTrendingPresets(client)).slice(0, 8);
+	const presets: Preset[] = (await getNewPresets(client)).slice(0, 12);
+	const popular: (Preset & PresetStats)[] = (await getPopularPresets(client)).slice(0, 12);
+	const trending: Preset[] = (await getTrendingPresets(client)).slice(0, 12);
 
 	const stats: Record<string, PresetStats> = {};
 	const authors: Record<string, string> = {};
