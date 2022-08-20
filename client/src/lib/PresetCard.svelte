@@ -29,10 +29,15 @@
 		{/if}
 		<a href={url}>
 			<div class="thumbnail" />
-			<div class="views-wrapper">
-				<span class="views">{stats.views} views</span>
-			</div>
 		</a>
+		{#if preset.spoiler}
+			<div class="spoiler-notice-wrapper">
+				<span class="spoiler-notice">Spoiler</span>
+			</div>
+		{/if}
+		<div class="views-wrapper">
+			<span class="views">{stats.views} views</span>
+		</div>
 	</div>
 	<div class="info">
 		{#if spoilerEnabled}
@@ -107,11 +112,30 @@
 			right: 10px;
 			padding: 4px;
 
+			cursor: default;
+
 			background-color: rgba(0.7, 0.7, 0.7, 0.6);
 			border-radius: 15px;
 		}
 
 		.views {
+			font-size: smaller;
+			color: white;
+		}
+
+		.spoiler-notice-wrapper {
+			position: absolute;
+			bottom: 42px;
+			right: 10px;
+			padding: 4px;
+
+			cursor: default;
+
+			background-color: rgba(0.7, 0.7, 0.7, 0.6);
+			border-radius: 15px;
+		}
+
+		.spoiler-notice {
 			font-size: smaller;
 			color: white;
 		}
