@@ -1,7 +1,6 @@
 import PocketBase from 'pocketbase';
 import type { Preset, PresetStats } from '$lib/preset';
 import type { PageLoad } from './$types';
-import { getSettings, type Settings } from '$lib/settings';
 
 const connect = () => {
 	return new PocketBase('http://127.0.0.1:8090');
