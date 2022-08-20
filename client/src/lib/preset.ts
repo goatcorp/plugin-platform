@@ -15,5 +15,5 @@ export interface PresetData {
 }
 
 export interface PresetStats {
-	views: number;
+	views: number; // Is it a good idea to give people a number to obsess over?
 }

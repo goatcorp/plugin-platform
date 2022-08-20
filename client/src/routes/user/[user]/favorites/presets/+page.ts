@@ -1,13 +1,16 @@
 import type { Preset, PresetStats } from '$lib/preset';
 import type { Profile } from '$lib/profile';
+import type { PageLoad } from './$types';
 import PocketBase from 'pocketbase';
 
 const connect = () => {
 	return new PocketBase('http://127.0.0.1:8090');
 };
 
-export async function load({ params }: { params: Record<string, string> }) {
+export const load: PageLoad = async ({ url, params }) => {
+	const page: number = parseInt(url.searchParams.get('page') || '1');
 	const id = params.user;
+
 	const client = connect();
 
 	const profileRecord = await client.records.getOne('profiles', id);
@@ -17,9 +20,9 @@ export async function load({ params }: { params: Record<string, string> }) {
 		avatar: profileRecord.avatar
 	};
 
-	const favorites = await client.records.getFullList('user_preset_favorites');
+	const favorites = await client.records.getList('user_preset_favorites', page, 50);
 	const presets: Preset[] = [];
-	for (const favorite of favorites) {
+	for (const favorite of favorites.items) {
 		const preset = await client.records.getOne('presets', favorite.preset);
 		presets.push({
 			id: preset.id,
@@ -57,5 +60,12 @@ export async function load({ params }: { params: Record<string, string> }) {
 			);
 	}
 
-	return { profile, presets, presetAuthors, presetStats };
-}
+	return {
+		profile,
+		presets,
+		presetAuthors,
+		presetStats,
+		page: favorites.page,
+		totalPages: favorites.totalPages
+	};
+};

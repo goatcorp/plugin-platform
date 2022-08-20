@@ -1,14 +1,17 @@
 import PocketBase from 'pocketbase';
 import type { Preset, PresetStats } from '$lib/preset';
+import type { PageLoad } from './$types';
 
 const connect = () => {
 	return new PocketBase('http://127.0.0.1:8090');
 };
 
-export async function load({ url }: { url: URL }) {
+export const load: PageLoad = async ({ url }) => {
+	const page: number = parseInt(url.searchParams.get('page') || '1');
+
 	const query = url.searchParams.get('q') || '';
 	const client = connect();
-	const records = await client.records.getList('presets', 1, undefined, {
+	const records = await client.records.getList('presets', page, 50, {
 		filter: `title~'${query}'`
 	});
 	const results: Preset[] = records.items.map((item) => ({
@@ -46,5 +49,5 @@ export async function load({ url }: { url: URL }) {
 		authors[result.author] = user.name;
 	}
 
-	return { results, authors, stats, query };
-}
+	return { results, authors, stats, query, page: records.page, totalPages: records.totalPages };
+};
