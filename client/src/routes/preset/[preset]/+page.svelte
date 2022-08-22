@@ -165,7 +165,9 @@
 		<h2>Tags</h2>
 		{#each tags as tag}
 			<div style="display: flex;">
-				<button on:click={() => removeTag(tag.id)}>Remove</button>
+				{#if user?.profile?.id === data.preset.author}
+					<button on:click={() => removeTag(tag.id)}>Remove</button>
+				{/if}
 				<div class="tag">{tag.label}</div>
 			</div>
 		{/each}
