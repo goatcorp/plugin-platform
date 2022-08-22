@@ -1,2 +1,8 @@
+.DS_Store
+
 *.exe
 /pb_data
+
+.env
+.env.*
+!.env.example
