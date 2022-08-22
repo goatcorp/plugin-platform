@@ -58,12 +58,15 @@ export const load: PageLoad = async ({ params }) => {
 		presetTags.push({ id: presetTag.id, label: presetTag.label });
 	}
 
+	const user = client.authStore.model;
 	const isFavoriteInitial =
-		(
-			await client.records.getList('user_preset_favorites', 1, 1, {
-				filter: `preset='${preset.id}'`
-			})
-		).totalItems !== 0;
+		'id' in user
+			? (
+					await client.records.getList('profile_preset_favorites', 1, 1, {
+						filter: `profile='${preset.id}'`
+					})
+			  ).totalItems !== 0
+			: null;
 
 	const authorName = (await client.records.getOne('profiles', preset.author)).name;
 

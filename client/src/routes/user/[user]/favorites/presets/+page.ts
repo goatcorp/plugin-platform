@@ -20,7 +20,10 @@ export const load: PageLoad = async ({ url, params }) => {
 		avatar: profileRecord.avatar
 	};
 
-	const favorites = await client.records.getList('user_preset_favorites', page, 50);
+	const favorites = await client.records.getList('profile_preset_favorites', page, 50, {
+		filter: `profile='${id}'`
+	});
+
 	const presets: Preset[] = [];
 	for (const favorite of favorites.items) {
 		const preset = await client.records.getOne('presets', favorite.preset);

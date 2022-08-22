@@ -94,14 +94,14 @@
 
 		// This should be done on the server later, it's just simpler to do this here for now
 		try {
-			const favorites = await client.records.getList('user_preset_favorites', 1, 1, {
-				filter: `preset='${data.preset.id}'`
+			const favorites = await client.records.getList('profile_preset_favorites', 1, 1, {
+				filter: `profile='${user.profile?.id}'`
 			});
 
 			if (favorites.totalItems === 0) {
 				try {
-					await client.records.create('user_preset_favorites', {
-						user: user.id,
+					await client.records.create('profile_preset_favorites', {
+						profile: user.profile?.id,
 						preset: data.preset.id
 					});
 					isFavorite = true;
@@ -110,7 +110,7 @@
 				}
 			} else {
 				try {
-					await client.records.delete('user_preset_favorites', favorites.items[0].id);
+					await client.records.delete('profile_preset_favorites', favorites.items[0].id);
 					isFavorite = false;
 				} catch (err) {
 					console.error(err);
@@ -141,9 +141,11 @@
 	<span>Created {data.preset.created.toLocaleDateString()}</span>
 	<span>Last updated {data.preset.updated.toLocaleDateString()}</span>
 	<span>{data.presetStats.views} views</span>
-	<button on:click={toggleFavorite}
-		>{isFavorite ? 'Remove from favorites' : 'Add to favorites'}</button
-	>
+	{#if isFavorite != null}
+		<button on:click={toggleFavorite}
+			>{isFavorite ? 'Remove from favorites' : 'Add to favorites'}</button
+		>
+	{/if}
 
 	{#if user?.profile?.id === data.preset.author}
 		<a href={`/preset/${data.preset.id}/edit`}>Edit preset</a>
