@@ -1,16 +1,22 @@
 <script lang="ts">
+	import PocketBase from 'pocketbase';
 	import type { PageData } from './$types';
 	import PresetCard from '$lib/PresetCard.svelte';
 	import { onMount } from 'svelte';
-	import { id } from '$lib/session';
 	import { getSettings } from '$lib/settings';
 
 	export let data: PageData;
 
 	let showSpoilers = false;
 
+	const connect = () => {
+		return new PocketBase('http://127.0.0.1:8090');
+	};
+
 	onMount(async () => {
-		const settings = await getSettings($id);
+		const client = connect();
+		const user = client.authStore.model;
+		const settings = await getSettings('id' in user ? user.id : undefined);
 		showSpoilers = settings.show_spoilers;
 	});
 </script>

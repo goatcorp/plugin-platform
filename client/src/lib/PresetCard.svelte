@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { id } from '$lib/session';
+	import PocketBase from 'pocketbase';
 	import { onMount } from 'svelte';
 	import type { Preset, PresetStats } from './preset';
 	import { getSettings } from './settings';
@@ -12,6 +12,10 @@
 	const url = `/preset/${preset.id}`;
 
 	let spoilerEnabled = preset.spoiler;
+
+	const connect = () => {
+		return new PocketBase('http://127.0.0.1:8090');
+	};
 
 	const dismissSpoiler = async (target: Element) => {
 		target.setAttribute('style', 'blur: none;');
@@ -26,7 +30,9 @@
 	};
 
 	onMount(async () => {
-		const settings = await getSettings($id);
+		const client = connect();
+		const user = client.authStore.model;
+		const settings = await getSettings('id' in user ? user.id : undefined);
 		showSpoilers = settings.show_spoilers;
 	});
 </script>

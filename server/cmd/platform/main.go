@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -70,6 +71,26 @@ func main() {
 				return c.JSON(200, results)
 			},
 		})
+
+		return nil
+	})
+
+	app.OnUserAfterOauth2Register().Add(func(e *core.UserOauth2RegisterEvent) error {
+		query := app.Dao().DB().
+			Update("profiles", dbx.Params{"name": e.AuthData.Name}, dbx.HashExp{"userid": e.User.Id})
+		res, err := query.Execute()
+		if err != nil {
+			return err
+		}
+
+		n, err := res.RowsAffected()
+		if err != nil {
+			return err
+		}
+
+		if n == 0 {
+			return errors.New("app: user not found")
+		}
 
 		return nil
 	})

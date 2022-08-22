@@ -1,6 +1,6 @@
 <script lang="ts">
+	import PocketBase from 'pocketbase';
 	import { onMount } from 'svelte';
-	import { id } from '$lib/session';
 	import { getSettings, updateSettings, type Settings } from '$lib/settings';
 
 	let settings: Settings | null = null;
@@ -29,8 +29,14 @@
 		await updateSettings(updated);
 	};
 
+	const connect = () => {
+		return new PocketBase('http://127.0.0.1:8090');
+	};
+
 	onMount(async () => {
-		settings = await getSettings($id);
+		const client = connect();
+		const user = client.authStore.model;
+		settings = await getSettings('id' in user ? user.id : undefined);
 	});
 </script>
 

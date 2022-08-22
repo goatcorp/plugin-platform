@@ -1,12 +1,9 @@
 <script lang="ts">
 	import 'normalize.css';
 	import PocketBase, { type User } from 'pocketbase';
-	import { onDestroy, onMount } from 'svelte';
-
-	import { id } from '$lib/session';
+	import { onMount } from 'svelte';
 
 	let user: User | null = null;
-	let invalidate: (() => void) | null = null;
 
 	const connect = () => {
 		return new PocketBase('http://127.0.0.1:8090');
@@ -14,26 +11,15 @@
 
 	const loadCurrentUser = async () => {
 		const client = connect();
-		if (!client.authStore.isValid || $id == null) {
-			user = null;
+		const model = client.authStore.model;
+		if ('id' in model) {
+			user = await client.users.getOne(model.id);
 			return;
 		}
-
-		user = await client.users.getOne($id);
 	};
 
 	onMount(async () => {
-		invalidate = id.subscribe(async () => {
-			await loadCurrentUser();
-		});
-
 		await loadCurrentUser();
-	});
-
-	onDestroy(() => {
-		if (invalidate != null) {
-			invalidate();
-		}
 	});
 </script>
 

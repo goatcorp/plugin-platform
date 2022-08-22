@@ -1,7 +1,5 @@
 <script lang="ts">
 	import PocketBase from 'pocketbase';
-	import { goto } from '$app/navigation';
-	import { id } from '$lib/session';
 	import { onMount } from 'svelte';
 
 	const connect = () => {
@@ -11,9 +9,9 @@
 	const logout = async () => {
 		const client = connect();
 		client.authStore.clear();
-		$id = null;
 		try {
-			await goto('/');
+			// Reloads state
+			location.assign('/');
 		} catch (err) {
 			console.error(err);
 		}

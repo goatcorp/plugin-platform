@@ -1,14 +1,12 @@
 <script lang="ts">
 	import PocketBase, { type User } from 'pocketbase';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
-	import { id } from '$lib/session';
 	import type { Tag } from '$lib/tags';
 
 	export let data: PageData;
 
 	let user: User | null = null;
-	let invalidate: (() => void) | null = null;
 	let isFavorite = data.isFavoriteInitial;
 	let tagOptions: Tag[] = [];
 	let tags: Tag[] = data.presetTags;
@@ -88,6 +86,10 @@
 	};
 
 	const toggleFavorite = async () => {
+		if (user == null) {
+			return;
+		}
+
 		const client = connect();
 
 		// This should be done on the server later, it's just simpler to do this here for now
@@ -99,7 +101,7 @@
 			if (favorites.totalItems === 0) {
 				try {
 					await client.records.create('user_preset_favorites', {
-						user: $id,
+						user: user.id,
 						preset: data.preset.id
 					});
 					isFavorite = true;
@@ -119,29 +121,17 @@
 		}
 	};
 
-	// This should be a store
 	const loadCurrentUser = async () => {
 		const client = connect();
-		if (!client.authStore.isValid || $id == null) {
-			user = null;
+		const model = client.authStore.model;
+		if ('id' in model) {
+			user = await client.users.getOne(model.id);
 			return;
 		}
-
-		user = await client.users.getOne($id);
 	};
 
 	onMount(async () => {
-		invalidate = id.subscribe(async () => {
-			await loadCurrentUser();
-		});
-
 		await loadCurrentUser();
-	});
-
-	onDestroy(() => {
-		if (invalidate != null) {
-			invalidate();
-		}
 	});
 </script>
 
