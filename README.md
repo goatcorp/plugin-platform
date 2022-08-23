@@ -46,7 +46,7 @@ Note that PocketBase uses SQLite (though I suspect this can be customized at the
 so certain features like schema-level permissions are not possible. These should instead be implemented through denormalization and
 application-level permissions.
 
-A migration should be generated in a new `migrations` folder. Move this inter the corresponding package in the `pkg` directory.
+A migration should be generated in a new `migrations` folder. Move this into the corresponding package in the `pkg` directory.
 Migrations can be applied by running:
 ```sh
 cd server
