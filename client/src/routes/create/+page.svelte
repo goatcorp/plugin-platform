@@ -1,15 +1,11 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
 	import { goto } from '$app/navigation';
-
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
+	import { connectBackend } from '$lib/backend';
 
 	const createPreset = async (data: FormData) => {
-		const client = connect();
+		const backend = connectBackend();
 
-		const user = client.authStore.model;
+		const user = backend.app.authStore.model;
 		if (!('id' in user && 'profile' in user)) {
 			return;
 		}
@@ -22,7 +18,7 @@
 		if (data.has('author')) preset.set('author', data.get('author')!);
 
 		try {
-			const presetRecord = await client.records.create('presets', preset);
+			const presetRecord = await backend.app.records.create('presets', preset);
 
 			const presetData = new FormData();
 			if (data.has('data0_title')) presetData.set('title', data.get('data0_title')!);
@@ -30,7 +26,7 @@
 			presetData.set('preset', presetRecord.id);
 
 			try {
-				await client.records.create('preset_data', presetData);
+				await backend.app.records.create('preset_data', presetData);
 			} catch (err) {
 				console.error(err);
 			}

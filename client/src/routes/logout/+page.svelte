@@ -1,14 +1,11 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
+	import { connectBackend } from '$lib/backend';
+
 	import { onMount } from 'svelte';
 
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
-
 	const logout = async () => {
-		const client = connect();
-		client.authStore.clear();
+		const backend = connectBackend();
+		backend.app.authStore.clear();
 		try {
 			// Reloads state
 			location.assign('/');

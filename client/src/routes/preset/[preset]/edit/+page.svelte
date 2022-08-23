@@ -1,36 +1,31 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
+	import { connectBackend } from '$lib/backend';
 
 	export let data: PageData;
 
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
-
 	const updatePreset = async (form: FormData) => {
-		const client = connect();
+		const backend = connectBackend();
 
 		const preset = new FormData();
 		if (form.has('title')) preset.set('title', form.get('title')!);
 		if (form.has('thumbnail')) preset.set('thumbnail', form.get('thumbnail')!);
 
 		try {
-			await client.records.update('presets', data.preset.id, preset);
+			await backend.app.records.update('presets', data.preset.id, preset);
 
 			const presetData = new FormData();
 			if (form.has('data0_title')) presetData.set('title', form.get('data0_title')!);
 			if (form.has('data0_data')) presetData.set('data', form.get('data0_data')!);
 
 			try {
-				await client.records.update('preset_data', data.presetData[0].id, presetData);
+				await backend.app.records.update('preset_data', data.presetData[0].id, presetData);
 			} catch (err) {
 				console.error(err);
 			}
 
 			// TODO: the other preset data entries
-
 			try {
 				await goto(`/preset/${data.preset.id}`);
 			} catch (err) {

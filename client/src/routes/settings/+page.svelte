@@ -1,7 +1,7 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
 	import { onMount } from 'svelte';
 	import { getSettings, updateSettings, type Settings } from '$lib/settings';
+	import { connectBackend } from '$lib/backend';
 
 	let settings: Settings | null = null;
 	let updated: Partial<Settings> = {};
@@ -29,14 +29,10 @@
 		await updateSettings(updated);
 	};
 
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
-
 	onMount(async () => {
-		const client = connect();
-		const user = client.authStore.model;
-		settings = await getSettings('id' in user ? user.id : undefined);
+		const backend = connectBackend();
+		const user = backend.getCurrentUser();
+		settings = await getSettings(user ? user.id : undefined);
 	});
 </script>
 

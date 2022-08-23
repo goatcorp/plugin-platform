@@ -4,7 +4,7 @@
 	export let preset: Preset;
 	export let stats: PresetStats;
 	export let authorName: string;
-	export let showSpoilers = false;
+	export let showSpoilers: boolean;
 
 	const url = `/preset/${preset.id}`;
 

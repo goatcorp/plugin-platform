@@ -1,19 +1,17 @@
 <script lang="ts">
 	import 'normalize.css';
-	import PocketBase, { type User } from 'pocketbase';
+	import { connectBackend } from '$lib/backend';
+	import type { User } from 'pocketbase';
 	import { onMount } from 'svelte';
 
 	let user: User | null = null;
 
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
-
 	const loadCurrentUser = async () => {
-		const client = connect();
-		const model = client.authStore.model;
-		if ('id' in model) {
-			user = await client.users.getOne(model.id);
+		const backend = connectBackend();
+		const model = backend.getCurrentUser();
+		if (model && 'id' in model) {
+			// The stored user data doesn't include the profile data
+			user = await backend.app.users.getOne(model.id);
 			return;
 		}
 	};

@@ -1,8 +1,9 @@
 <script lang="ts">
-	import PocketBase, { type User } from 'pocketbase';
+	import type { User } from 'pocketbase';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import type { Tag } from '$lib/tags';
+	import { connectBackend } from '$lib/backend';
 
 	export let data: PageData;
 
@@ -11,13 +12,9 @@
 	let tagOptions: Tag[] = [];
 	let tags: Tag[] = data.presetTags;
 
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
-
 	const getTags = async (q: string) => {
-		const client = connect();
-		const tags = await client.records.getList('tags', 1, 10, {
+		const backend = connectBackend();
+		const tags = await backend.app.records.getList('tags', 1, 10, {
 			filter: `label~'${q}'`
 		});
 		return tags.items.map((record) => ({ id: record.id, label: record.label }));
@@ -39,9 +36,9 @@
 			return;
 		}
 
-		const client = connect();
+		const backend = connectBackend();
 		try {
-			await client.records.create('preset_tags', {
+			await backend.app.records.create('preset_tags', {
 				preset: data.preset.id,
 				tag: tag.id
 			});
@@ -64,9 +61,9 @@
 			return;
 		}
 
-		const client = connect();
+		const backend = connectBackend();
 		try {
-			const relation = await client.records.getList('preset_tags', 1, 1, {
+			const relation = await backend.app.records.getList('preset_tags', 1, 1, {
 				filter: `preset='${data.preset.id}' && tag='${tagId}'`
 			});
 			if (relation.items.length === 0) {
@@ -74,7 +71,7 @@
 				return;
 			}
 
-			await client.records.delete('preset_tags', relation.items[0].id);
+			await backend.app.records.delete('preset_tags', relation.items[0].id);
 			tags.splice(
 				tags.findIndex((tag) => tag.id === tagId),
 				1
@@ -90,17 +87,17 @@
 			return;
 		}
 
-		const client = connect();
+		const backend = connectBackend();
 
 		// This should be done on the server later, it's just simpler to do this here for now
 		try {
-			const favorites = await client.records.getList('profile_preset_favorites', 1, 1, {
+			const favorites = await backend.app.records.getList('profile_preset_favorites', 1, 1, {
 				filter: `profile='${user.profile?.id}'`
 			});
 
 			if (favorites.totalItems === 0) {
 				try {
-					await client.records.create('profile_preset_favorites', {
+					await backend.app.records.create('profile_preset_favorites', {
 						profile: user.profile?.id,
 						preset: data.preset.id
 					});
@@ -110,7 +107,7 @@
 				}
 			} else {
 				try {
-					await client.records.delete('profile_preset_favorites', favorites.items[0].id);
+					await backend.app.records.delete('profile_preset_favorites', favorites.items[0].id);
 					isFavorite = false;
 				} catch (err) {
 					console.error(err);
@@ -122,10 +119,9 @@
 	};
 
 	const loadCurrentUser = async () => {
-		const client = connect();
-		const model = client.authStore.model;
-		if ('id' in model) {
-			user = await client.users.getOne(model.id);
+		const backend = connectBackend();
+		if (backend.isAuthenticated()) {
+			user = backend.getCurrentUser();
 			return;
 		}
 	};

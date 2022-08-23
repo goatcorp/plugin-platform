@@ -1,10 +1,10 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
 	import PresetRow from '$lib/PresetRow.svelte';
 	import { getSettings } from '$lib/settings';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import type { Tag } from '$lib/tags';
+	import { connectBackend } from '$lib/backend';
 
 	export let data: PageData;
 
@@ -23,13 +23,9 @@
 			  })()
 			: [];
 
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
-
 	const getTags = async (q: string) => {
-		const client = connect();
-		const tags = await client.records.getList('tags', 1, 10, {
+		const backend = connectBackend();
+		const tags = await backend.app.records.getList('tags', 1, 10, {
 			filter: `label~'${q}'`
 		});
 		return tags.items.map((record) => ({ id: record.id, label: record.label }));
@@ -59,9 +55,9 @@
 	};
 
 	onMount(async () => {
-		const client = connect();
-		const user = client.authStore.model;
-		const settings = await getSettings('id' in user ? user.id : undefined);
+		const backend = connectBackend();
+		const user = backend.getCurrentUser();
+		const settings = await getSettings(user ? user.id : undefined);
 		showSpoilers = settings.show_spoilers;
 	});
 </script>

@@ -1,85 +1,47 @@
-import type { ListResult } from '$lib/pocketbase-ext';
-import type { Preset, PresetStats } from '$lib/preset';
-import PocketBase, { type Record as PocketBaseRecord } from 'pocketbase';
+import { Backend, connectBackend } from '$lib/backend';
+import { Preset, type PresetStats } from '$lib/preset';
 
-const connect = () => {
-	return new PocketBase('http://127.0.0.1:8090');
-};
-
-const getNewPresets = async (client: PocketBase) => {
-	const presetList = await client.records.getList('presets', 1, undefined, {
+const getNewPresets = async (backend: Backend) => {
+	const presetList = await backend.app.records.getList('presets', 1, undefined, {
 		sort: '-created'
 	});
-	const presets = presetList.items.map((item) => ({
-		id: item.id,
-		thumbnail: item.thumbnail,
-		title: item.title,
-		author: item.author,
-		spoiler: item.spoiler,
-		created: new Date(item.created),
-		updated: new Date(item.updated)
-	}));
+	const presets = presetList.items.map((item) => Preset.fromRecord(item));
 	return presets;
 };
 
-const getPopularPresets = async (client: PocketBase) => {
-	const presetList: ListResult<PocketBaseRecord> = await client.send('/api/presets/popular', {});
-	const presets = presetList.items.map((item) => ({
-		id: item.id,
-		thumbnail: item.thumbnail,
-		title: item.title,
-		author: item.author,
-		spoiler: item.spoiler,
-		views: item.views,
-		created: new Date(item.created),
-		updated: new Date(item.updated)
-	}));
+const getPopularPresets = async (backend: Backend) => {
+	const presetList = await backend.search('/api/presets/popular');
+	const presets = presetList.items.map((item) => {
+		const preset = Preset.fromRecord(item);
+		return { ...preset, views: item.views };
+	});
 	return presets;
 };
 
-const getTrendingPresets = async (client: PocketBase) => {
-	const presetList: ListResult<PocketBaseRecord> = await client.send('/api/presets/trending', {});
-	const presets = presetList.items.map((item) => ({
-		id: item.id,
-		thumbnail: item.thumbnail,
-		title: item.title,
-		author: item.author,
-		spoiler: item.spoiler,
-		created: new Date(item.created),
-		updated: new Date(item.updated)
-	}));
+const getTrendingPresets = async (backend: Backend) => {
+	const presetList = await backend.search('/api/presets/trending');
+	const presets = presetList.items.map((item) => Preset.fromRecord(item));
 	return presets;
 };
 
 export async function load() {
-	const client = connect();
+	const backend = connectBackend();
 
-	const presets: Preset[] = (await getNewPresets(client)).slice(0, 12);
-	const popular: (Preset & PresetStats)[] = (await getPopularPresets(client)).slice(0, 12);
-	const trending: Preset[] = (await getTrendingPresets(client)).slice(0, 12);
+	const presets: Preset[] = (await getNewPresets(backend)).slice(0, 12);
+	const popular: (Preset & PresetStats)[] = (await getPopularPresets(backend)).slice(0, 12);
+	const trending: Preset[] = (await getTrendingPresets(backend)).slice(0, 12);
 
 	const stats: Record<string, PresetStats> = {};
 	const authors: Record<string, string> = {};
 	for (const preset of presets.concat(popular).concat(trending)) {
-		const statsRecords = await client.records.getFullList('preset_stats', undefined, {
-			filter: `preset~'${preset.id}'`
-		});
-		stats[preset.id] = statsRecords
-			.map((record) => ({
-				views: record.views
-			}))
-			.reduce(
-				(agg, next) => {
-					agg.views += next.views;
-					return agg;
-				},
-				{
-					views: 0
-				}
-			);
+		if (!authors[preset.author]) {
+			const author = await backend.app.records.getOne('profiles', preset.author);
+			authors[preset.author] = author.name;
+		}
 
-		const user = await client.records.getOne('profiles', preset.author);
-		authors[preset.author] = user.name;
+		if (!stats[preset.id]) {
+			stats[preset.id] = await backend.fetchPresetStats(preset.id);
+		}
 	}
 
 	return { presets, popular, trending, stats, authors };

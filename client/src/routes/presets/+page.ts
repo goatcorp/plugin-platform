@@ -1,56 +1,30 @@
-import PocketBase, { type Record as PocketBaseRecord } from 'pocketbase';
-import type { Preset, PresetStats } from '$lib/preset';
+import { Preset, type PresetStats } from '$lib/preset';
 import type { PageLoad } from './$types';
-import type { ListResult } from '$lib/pocketbase-ext';
-
-const connect = () => {
-	return new PocketBase('http://127.0.0.1:8090');
-};
+import { connectBackend } from '$lib/backend';
 
 export const load: PageLoad = async ({ url }) => {
-	const filteredParams = new URLSearchParams();
-	filteredParams.set('page', url.searchParams.get('page') || '1');
-	filteredParams.set('tags', url.searchParams.get('tags') || '');
-
-	const client = connect();
-	const records: ListResult<PocketBaseRecord> = await client.send(
-		`/api/presets/search?${filteredParams.toString()}`,
+	const backend = connectBackend();
+	const records = await backend.search(
+		'/api/presets/search',
+		{
+			page: url.searchParams.get('page') || '1',
+			tags: url.searchParams.get('tags') || ''
+		},
 		{}
 	);
-	const presets: Preset[] = records.items.map((item) => ({
-		id: item.id,
-		thumbnail: item.thumbnail,
-		title: item.title,
-		author: item.author,
-		spoiler: item.spoiler,
-		created: new Date(item.created),
-		updated: new Date(item.updated)
-	}));
+	const presets: Preset[] = records.items.map((item) => Preset.fromRecord(item));
 
 	const stats: Record<string, PresetStats> = {};
-	for (const preset of presets) {
-		const presetStatsRecords = await client.records.getFullList('preset_stats', undefined, {
-			filter: `preset~'${preset.id}'`
-		});
-		stats[preset.id] = presetStatsRecords
-			.map((record) => ({
-				views: record.views
-			}))
-			.reduce(
-				(agg, next) => {
-					agg.views += next.views;
-					return agg;
-				},
-				{
-					views: 0
-				}
-			);
-	}
-
 	const authors: Record<string, string> = {};
-	for (const result of presets) {
-		const user = await client.records.getOne('profiles', result.author);
-		authors[result.author] = user.name;
+	for (const preset of presets) {
+		if (!authors[preset.author]) {
+			const author = await backend.app.records.getOne('profiles', preset.author);
+			authors[preset.author] = author.name;
+		}
+
+		if (!stats[preset.id]) {
+			stats[preset.id] = await backend.fetchPresetStats(preset.id);
+		}
 	}
 
 	return { presets, authors, stats, page: records.page, totalPages: records.totalPages };

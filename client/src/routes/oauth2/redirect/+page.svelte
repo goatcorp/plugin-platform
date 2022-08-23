@@ -1,10 +1,7 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
-	import { onMount } from 'svelte';
+	import { connectBackend } from '$lib/backend';
 
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
+	import { onMount } from 'svelte';
 
 	const exchangeToken = async () => {
 		const dataRaw = sessionStorage.getItem('oauth2');
@@ -33,9 +30,9 @@
 			return;
 		}
 
-		const client = connect();
+		const backend = connectBackend();
 		try {
-			await client.users.authViaOAuth2(
+			await backend.app.users.authViaOAuth2(
 				data.name,
 				providerCode,
 				data.codeVerifier,

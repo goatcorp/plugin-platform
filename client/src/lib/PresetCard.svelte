@@ -1,21 +1,14 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
-	import { onMount } from 'svelte';
 	import type { Preset, PresetStats } from './preset';
-	import { getSettings } from './settings';
 
 	export let preset: Preset;
 	export let stats: PresetStats;
 	export let authorName: string;
-	export let showSpoilers = false;
+	export let showSpoilers: boolean;
 
 	const url = `/preset/${preset.id}`;
 
 	let spoilerEnabled = preset.spoiler;
-
-	const connect = () => {
-		return new PocketBase('http://127.0.0.1:8090');
-	};
 
 	const dismissSpoiler = async (target: Element) => {
 		target.setAttribute('style', 'blur: none;');
@@ -28,13 +21,6 @@
 		await new Promise((resolve) => setTimeout(resolve, 100));
 		spoilerEnabled = false;
 	};
-
-	onMount(async () => {
-		const client = connect();
-		const user = client.authStore.model;
-		const settings = await getSettings('id' in user ? user.id : undefined);
-		showSpoilers = settings.show_spoilers;
-	});
 </script>
 
 <div class="preset-card">
