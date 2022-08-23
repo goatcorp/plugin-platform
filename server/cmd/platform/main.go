@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v5"
@@ -22,6 +23,16 @@ type preset struct {
 	Spoiler   bool   `json:"spoiler"`
 	Created   string `json:"created"`
 	Updated   string `json:"updated"`
+}
+
+// https://gist.github.com/heri16/077282d46ae95d48d430a90fb6accdff?permalink_comment_id=4219415#gistcomment-4219415
+func interfaceSlice[P any](slice []P) []any {
+	ret := make([]any, len(slice))
+	for i := 0; i < len(slice); i++ {
+		v := slice[i]
+		ret[i] = any(v)
+	}
+	return ret
 }
 
 func main() {
@@ -72,6 +83,37 @@ func main() {
 					InnerJoin("(SELECT * FROM preset_stats WHERE date >= date('now', '-1 day')) AS recent", dbx.NewExp("presets.id = recent.preset")).
 					GroupBy("recent.preset").
 					OrderBy("recent.views DESC")
+				fieldResolver := search.NewSimpleFieldResolver("*")
+
+				result, err := search.NewProvider(fieldResolver).Query(query).Exec(&presets)
+				if err != nil {
+					return err
+				}
+
+				return c.JSON(200, result)
+			},
+		})
+
+		return nil
+	})
+
+	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+		e.Router.AddRoute(echo.Route{
+			Method: http.MethodGet,
+			Path:   "/api/presets/search",
+			Handler: func(c echo.Context) error {
+				var presets []*preset
+
+				q := c.QueryParam("q")
+				rawTags := c.QueryParam("tags")
+				tags := strings.Split(rawTags, ",")
+
+				query := app.Dao().DB().
+					Select("presets.*").
+					From("presets").
+					InnerJoin("preset_tags", dbx.NewExp("presets.id = preset_tags.preset")).
+					InnerJoin("tags", dbx.NewExp("preset_tags.tag = tags.id")).
+					Where(dbx.And(dbx.In("tags.label", interfaceSlice(tags)...), dbx.Like("presets.title", q)))
 				fieldResolver := search.NewSimpleFieldResolver("*")
 
 				result, err := search.NewProvider(fieldResolver).Query(query).Exec(&presets)
