@@ -99,12 +99,20 @@ func main() {
 		// Store new plugins
 		for _, p := range reformatted {
 			if _, ok := reformattedKnown[p.InternalName]; !ok {
-				_, err := app.Dao().DB().
-					Insert("plugins", dbx.Params{"internal_name": p.InternalName, "name": p.Name}).
-					Execute()
+				coll, err := app.Dao().FindCollectionByNameOrId("plugins")
 				if err != nil {
 					return err
 				}
+
+				record := models.NewRecord(coll)
+
+				record.SetDataValue("internal_name", p.InternalName)
+				record.SetDataValue("name", p.Name)
+				err = app.Dao().SaveRecord(record)
+				if err != nil {
+					return err
+				}
+
 				log.Printf("Added %s (%s) to known plugins", p.Name, p.InternalName)
 			}
 		}
