@@ -1,4 +1,4 @@
-module github.com/karashiiro/plugin-platform
+module github.com/karashiiro/plugin-platform/server
 
 go 1.19
 

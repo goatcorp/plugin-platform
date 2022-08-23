@@ -14,6 +14,8 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/models"
 	"github.com/pocketbase/pocketbase/tools/search"
+
+	_ "github.com/karashiiro/plugin-platform/server/pkg/migrations"
 )
 
 type preset struct {
