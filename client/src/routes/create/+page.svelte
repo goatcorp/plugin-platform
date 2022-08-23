@@ -1,6 +1,5 @@
 <script lang="ts">
 	import PocketBase from 'pocketbase';
-	import { id } from '$lib/session';
 	import { goto } from '$app/navigation';
 
 	const connect = () => {
@@ -8,12 +7,13 @@
 	};
 
 	const createPreset = async (data: FormData) => {
-		if ($id == null) {
+		const client = connect();
+
+		const user = client.authStore.model;
+		if (!('id' in user && 'profile' in user)) {
 			return;
 		}
 
-		const client = connect();
-		const user = await client.users.getOne($id);
 		data.set('author', user.profile?.id || '');
 
 		const preset = new FormData();
