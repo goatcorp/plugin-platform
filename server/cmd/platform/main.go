@@ -11,7 +11,18 @@ import (
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/models"
+	"github.com/pocketbase/pocketbase/tools/search"
 )
+
+type preset struct {
+	Id        string `json:"id"`
+	Thumbnail string `json:"thumbnail"`
+	Title     string `json:"title"`
+	Author    string `json:"author"`
+	Spoiler   bool   `json:"spoiler"`
+	Created   string `json:"created"`
+	Updated   string `json:"updated"`
+}
 
 func main() {
 	app := pocketbase.New()
@@ -21,25 +32,26 @@ func main() {
 			Method: http.MethodGet,
 			Path:   "/api/presets/popular",
 			Handler: func(c echo.Context) error {
-				var results []struct {
-					Id        string `json:"id"`
-					Thumbnail string `json:"thumbnail"`
-					Title     string `json:"title"`
-					Author    string `json:"author"`
-					Spoiler   bool   `json:"spoiler"`
-					Created   string `json:"created"`
-					Updated   string `json:"updated"`
-					Views     int64  `json:"views"`
+				var presets []struct {
+					preset
+					Views int64 `json:"views"`
 				}
 
-				err := app.Dao().DB().
-					NewQuery("SELECT presets.*, SUM(preset_stats.views) AS views FROM presets JOIN preset_stats ON presets.id = preset_stats.preset GROUP BY preset_stats.preset ORDER BY views DESC LIMIT 20").
-					All(&results)
+				// Return the presets ordered by their views
+				query := app.Dao().DB().
+					Select("presets.*", "SUM(preset_stats.views) AS views").
+					From("presets").
+					InnerJoin("preset_stats", dbx.NewExp("presets.id = preset_stats.preset")).
+					GroupBy("preset_stats.preset").
+					OrderBy("views DESC")
+				fieldResolver := search.NewSimpleFieldResolver("*")
+
+				result, err := search.NewProvider(fieldResolver).Query(query).Exec(&presets)
 				if err != nil {
 					return err
 				}
 
-				return c.JSON(200, results)
+				return c.JSON(200, result)
 			},
 		})
 
@@ -51,24 +63,23 @@ func main() {
 			Method: http.MethodGet,
 			Path:   "/api/presets/trending",
 			Handler: func(c echo.Context) error {
-				var results []struct {
-					Id        string `json:"id"`
-					Thumbnail string `json:"thumbnail"`
-					Title     string `json:"title"`
-					Author    string `json:"author"`
-					Spoiler   bool   `json:"spoiler"`
-					Created   string `json:"created"`
-					Updated   string `json:"updated"`
-				}
+				var presets []*preset
 
-				err := app.Dao().DB().
-					NewQuery("SELECT presets.*, MAX(preset_stats.date) FROM presets JOIN preset_stats ON presets.id = preset_stats.preset GROUP BY preset_stats.preset ORDER BY preset_stats.views DESC LIMIT 20").
-					All(&results)
+				// Return the presets ordered only by today's views
+				query := app.Dao().DB().
+					Select("presets.*", "SUM(views)").
+					From("presets").
+					InnerJoin("(SELECT * FROM preset_stats WHERE date >= date('now', '-1 day')) AS recent", dbx.NewExp("presets.id = recent.preset")).
+					GroupBy("recent.preset").
+					OrderBy("recent.views DESC")
+				fieldResolver := search.NewSimpleFieldResolver("*")
+
+				result, err := search.NewProvider(fieldResolver).Query(query).Exec(&presets)
 				if err != nil {
 					return err
 				}
 
-				return c.JSON(200, results)
+				return c.JSON(200, result)
 			},
 		})
 

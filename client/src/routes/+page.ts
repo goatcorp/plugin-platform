@@ -1,29 +1,30 @@
+import type { ListResult } from '$lib/pocketbase-ext';
 import type { Preset, PresetStats } from '$lib/preset';
-import PocketBase from 'pocketbase';
+import PocketBase, { type Record as PocketBaseRecord } from 'pocketbase';
 
 const connect = () => {
 	return new PocketBase('http://127.0.0.1:8090');
 };
 
 const getNewPresets = async (client: PocketBase) => {
-	const presetList = await client.records.getList('presets');
-	const presets = presetList.items
-		.map((item) => ({
-			id: item.id,
-			thumbnail: item.thumbnail,
-			title: item.title,
-			author: item.author,
-			spoiler: item.spoiler,
-			created: new Date(item.created),
-			updated: new Date(item.updated)
-		}))
-		.sort((a, b) => b.created.valueOf() - a.created.valueOf());
+	const presetList = await client.records.getList('presets', 1, undefined, {
+		sort: '-created'
+	});
+	const presets = presetList.items.map((item) => ({
+		id: item.id,
+		thumbnail: item.thumbnail,
+		title: item.title,
+		author: item.author,
+		spoiler: item.spoiler,
+		created: new Date(item.created),
+		updated: new Date(item.updated)
+	}));
 	return presets;
 };
 
 const getPopularPresets = async (client: PocketBase) => {
-	const presetList: (Preset & PresetStats)[] = await client.send('/api/presets/popular', {});
-	const presets = presetList.map((item) => ({
+	const presetList: ListResult<PocketBaseRecord> = await client.send('/api/presets/popular', {});
+	const presets = presetList.items.map((item) => ({
 		id: item.id,
 		thumbnail: item.thumbnail,
 		title: item.title,
@@ -37,8 +38,8 @@ const getPopularPresets = async (client: PocketBase) => {
 };
 
 const getTrendingPresets = async (client: PocketBase) => {
-	const presetList: Preset[] = await client.send('/api/presets/trending', {});
-	const presets = presetList.map((item) => ({
+	const presetList: ListResult<PocketBaseRecord> = await client.send('/api/presets/trending', {});
+	const presets = presetList.items.map((item) => ({
 		id: item.id,
 		thumbnail: item.thumbnail,
 		title: item.title,
