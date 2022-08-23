@@ -1,19 +1,21 @@
-import PocketBase from 'pocketbase';
+import PocketBase, { type Record as PocketBaseRecord } from 'pocketbase';
 import type { Preset, PresetStats } from '$lib/preset';
 import type { PageLoad } from './$types';
+import type { ListResult } from '$lib/pocketbase-ext';
 
 const connect = () => {
 	return new PocketBase('http://127.0.0.1:8090');
 };
 
 export const load: PageLoad = async ({ url }) => {
-	const page: number = parseInt(url.searchParams.get('page') || '1');
-
 	const query = url.searchParams.get('q') || '';
+
 	const client = connect();
-	const records = await client.records.getList('presets', page, 50, {
-		filter: `title~'${query}'`
-	});
+
+	const records: ListResult<PocketBaseRecord> = await client.send(
+		`/api/presets/search?${url.searchParams.toString()}`,
+		{}
+	);
 	const results: Preset[] = records.items.map((item) => ({
 		id: item.id,
 		thumbnail: item.thumbnail,

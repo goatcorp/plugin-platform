@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -105,18 +106,34 @@ func main() {
 				var presets []*preset
 
 				q := c.QueryParam("q")
+
+				rawPage := c.QueryParam("page")
+				page, err := strconv.ParseInt(rawPage, 10, 32)
+				if err != nil {
+					page = 1
+				}
+
+				var tags []string
 				rawTags := c.QueryParam("tags")
-				tags := strings.Split(rawTags, ",")
+				if rawTags != "" {
+					tags = strings.Split(rawTags, ",")
+				}
+
+				var whereExpr dbx.Expression
+				whereExpr = dbx.Like("presets.title", q)
+				if len(tags) > 0 {
+					whereExpr = dbx.And(dbx.In("tags.label", interfaceSlice(tags)...), whereExpr)
+				}
 
 				query := app.Dao().DB().
 					Select("presets.*").
 					From("presets").
-					InnerJoin("preset_tags", dbx.NewExp("presets.id = preset_tags.preset")).
-					InnerJoin("tags", dbx.NewExp("preset_tags.tag = tags.id")).
-					Where(dbx.And(dbx.In("tags.label", interfaceSlice(tags)...), dbx.Like("presets.title", q)))
+					LeftJoin("preset_tags", dbx.NewExp("presets.id = preset_tags.preset")).
+					LeftJoin("tags", dbx.NewExp("preset_tags.tag = tags.id")).
+					Where(whereExpr)
 				fieldResolver := search.NewSimpleFieldResolver("*")
 
-				result, err := search.NewProvider(fieldResolver).Query(query).Exec(&presets)
+				result, err := search.NewProvider(fieldResolver).Query(query).Page(int(page)).Exec(&presets)
 				if err != nil {
 					return err
 				}
