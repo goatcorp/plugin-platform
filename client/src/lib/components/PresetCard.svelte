@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Preset, PresetStats } from './preset';
+	import type { Preset, PresetStats } from '../preset';
 
 	export let preset: Preset;
 	export let stats: PresetStats;

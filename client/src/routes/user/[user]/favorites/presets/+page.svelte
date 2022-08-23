@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import PresetRow from '$lib/PresetRow.svelte';
+	import PresetRow from '$lib/components/PresetRow.svelte';
 	import { onMount } from 'svelte';
 	import { getSettings } from '$lib/settings';
 	import { connectBackend } from '$lib/backend';

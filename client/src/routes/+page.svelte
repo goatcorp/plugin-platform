@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import PresetCard from '$lib/PresetCard.svelte';
+	import PresetCard from '$lib/components/PresetCard.svelte';
 	import { onMount } from 'svelte';
 	import { getSettings } from '$lib/settings';
 	import { connectBackend } from '$lib/backend';
