@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -28,6 +30,11 @@ type preset struct {
 	Updated   string `json:"updated"`
 }
 
+type plogon struct {
+	InternalName string `json:"InternalName"`
+	Name         string `json:"Name"`
+}
+
 // https://gist.github.com/heri16/077282d46ae95d48d430a90fb6accdff?permalink_comment_id=4219415#gistcomment-4219415
 func interfaceSlice[P any](slice []P) []any {
 	ret := make([]any, len(slice))
@@ -40,6 +47,90 @@ func interfaceSlice[P any](slice []P) []any {
 
 func main() {
 	app := pocketbase.New()
+
+	checkPlugins := func() error {
+		// Get plogons
+		res, err := http.Get("https://kamori.goats.dev/Plugin/PluginMaster")
+		if err != nil {
+			return err
+		}
+		defer res.Body.Close()
+
+		data, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+
+		var plogons []plogon
+		err = json.Unmarshal(data, &plogons)
+		if err != nil {
+			return err
+		}
+
+		// Reformat as a map
+		reformatted := map[string]plogon{}
+		for _, plogon := range plogons {
+			reformatted[plogon.InternalName] = plogon
+		}
+
+		// Get known plogons
+		result, err := app.Dao().DB().
+			Select("internal_name").
+			From("plugins").
+			Build().
+			Rows()
+		if err != nil {
+			return err
+		}
+
+		// Reformat as a map
+		reformattedKnown := map[string]bool{}
+		for result.Next() {
+			var internalName string
+
+			err := result.Scan(&internalName)
+			if err != nil {
+				return err
+			}
+
+			reformattedKnown[internalName] = true
+		}
+
+		// Store new plugins
+		for _, p := range reformatted {
+			if _, ok := reformattedKnown[p.InternalName]; !ok {
+				_, err := app.Dao().DB().
+					Insert("plugins", dbx.Params{"internal_name": p.InternalName, "name": p.Name}).
+					Execute()
+				if err != nil {
+					return err
+				}
+				log.Printf("Added %s (%s) to known plugins", p.Name, p.InternalName)
+			}
+		}
+
+		return nil
+	}
+
+	ticker := time.NewTicker(5 * time.Minute)
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			case <-ticker.C:
+				err := checkPlugins()
+				if err != nil {
+					log.Println(err)
+				}
+			}
+		}
+	}()
+	defer func() {
+		ticker.Stop()
+		done <- true
+	}()
 
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		e.Router.AddRoute(echo.Route{
