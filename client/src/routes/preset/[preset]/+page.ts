@@ -1,6 +1,7 @@
 import { Preset, type PresetData } from '$lib/preset';
 import type { PageLoad } from './$types';
 import { connectBackend } from '$lib/backend';
+import type { Plugin } from '$lib/plugins';
 
 export const load: PageLoad = async ({ params }) => {
 	const id = params.preset;
@@ -28,6 +29,15 @@ export const load: PageLoad = async ({ params }) => {
 
 	const authorName = (await backend.app.records.getOne('profiles', preset.author)).name;
 
+	const pluginRecords = await backend.app.records.getFullList('plugins');
+	const plugins: Plugin[] = pluginRecords
+		.map((record) => ({
+			id: record.id as string,
+			internal_name: record.internal_name as string,
+			name: record.name as string
+		}))
+		.sort((a, b) => a.name.localeCompare(b.name));
+
 	return {
 		preset,
 		presetData,
@@ -35,6 +45,7 @@ export const load: PageLoad = async ({ params }) => {
 		presetTags,
 		presetPlugin,
 		authorName,
-		isFavoriteInitial
+		isFavoriteInitial,
+		plugins
 	};
 };

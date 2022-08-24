@@ -14,18 +14,8 @@
 	let isFavorite = data.isFavoriteInitial;
 	let tagOptions: Tag[] = [];
 	let tags: Tag[] = data.presetTags;
-	let plugins: Plugin[] = [];
+	let plugins = data.plugins;
 	let presetPlugin: Plugin | null | undefined = data.presetPlugin;
-
-	const getPlugins = async () => {
-		const backend = connectBackend();
-		const pluggies = await backend.app.records.getFullList('plugins');
-		return pluggies.map((pluggy) => ({
-			id: pluggy.id,
-			internal_name: pluggy.internal_name,
-			name: pluggy.name
-		}));
-	};
 
 	const searchTags = async (q: string) => {
 		const backend = connectBackend();
@@ -174,7 +164,6 @@
 
 	onMount(async () => {
 		await loadCurrentUser();
-		plugins = await getPlugins();
 	});
 </script>
 
