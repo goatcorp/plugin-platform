@@ -8,7 +8,8 @@ export const load: PageLoad = async ({ url }) => {
 		'/api/presets/search',
 		{
 			page: url.searchParams.get('page') || '1',
-			tags: url.searchParams.get('tags') || ''
+			tags: url.searchParams.get('tags') || '',
+			plugin: url.searchParams.get('plugin') || ''
 		},
 		{}
 	);
@@ -27,5 +28,14 @@ export const load: PageLoad = async ({ url }) => {
 		}
 	}
 
-	return { presets, authors, stats, page: records.page, totalPages: records.totalPages };
+	const pluginRecords = await backend.app.records.getFullList('plugins');
+	const plugins = pluginRecords
+		.map((record) => ({
+			id: record.id as string,
+			internal_name: record.internal_name as string,
+			name: record.name as string
+		}))
+		.sort((a, b) => a.name.localeCompare(b.name));
+
+	return { presets, authors, stats, plugins, page: records.page, totalPages: records.totalPages };
 };

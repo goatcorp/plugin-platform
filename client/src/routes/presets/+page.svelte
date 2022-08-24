@@ -4,12 +4,14 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import type { Tag } from '$lib/tags';
+	import type { Plugin } from '$lib/plugins';
 	import { connectBackend } from '$lib/backend';
 
 	export let data: PageData;
 
 	let showSpoilers = false;
 	let tagOptions: Tag[] = [];
+
 	let selectedTags: string[] =
 		typeof location !== 'undefined'
 			? (() => {
@@ -22,6 +24,15 @@
 					return [];
 			  })()
 			: [];
+	let selectedPlugin: Plugin | null =
+		typeof location !== 'undefined'
+			? (() => {
+					const url = new URL(location.toString());
+					const plugin = url.searchParams.get('plugin');
+					const found = data.plugins.find((p) => p.internal_name === plugin);
+					return found || null;
+			  })()
+			: null;
 
 	const getTags = async (q: string) => {
 		const backend = connectBackend();
@@ -79,10 +90,25 @@
 		{/each}
 	</select>
 
+	<h2>Plugin</h2>
+	<div>
+		<select>
+			<option value="" disabled selected={selectedPlugin == null}>--Select a plugin--</option>
+			{#each data.plugins as plugin}
+				<option
+					value={plugin.id}
+					on:click={() => (selectedPlugin = plugin)}
+					selected={selectedPlugin?.id === plugin.id}>{plugin.name}</option
+				>
+			{/each}
+		</select>
+	</div>
+
 	<button
 		on:click={() => {
-			const params = new URL(location.toString()).searchParams;
-			params.set('tags', selectedTags.join(','));
+			const params = new URLSearchParams();
+			if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
+			if (selectedPlugin != null) params.set('plugin', selectedPlugin.internal_name);
 			location.assign('?' + params.toString());
 		}}>Search</button
 	>

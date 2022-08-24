@@ -220,10 +220,16 @@ func main() {
 					tags = strings.Split(rawTags, ",")
 				}
 
+				plugin := c.QueryParam("plugin")
+
 				var whereExpr dbx.Expression
 				whereExpr = dbx.Like("presets.title", q)
 				if len(tags) > 0 {
 					whereExpr = dbx.And(dbx.In("tags.label", interfaceSlice(tags)...), whereExpr)
+				}
+
+				if plugin != "" {
+					whereExpr = dbx.And(dbx.NewExp("plugins.internal_name = {:internal_name}", dbx.Params{"internal_name": plugin}), whereExpr)
 				}
 
 				query := app.Dao().DB().
@@ -231,6 +237,8 @@ func main() {
 					From("presets").
 					LeftJoin("preset_tags", dbx.NewExp("presets.id = preset_tags.preset")).
 					LeftJoin("tags", dbx.NewExp("preset_tags.tag = tags.id")).
+					LeftJoin("preset_plugins", dbx.NewExp("presets.id = preset_plugins.preset")).
+					LeftJoin("plugins", dbx.NewExp("preset_plugins.plugin = plugins.id")).
 					Where(whereExpr)
 				fieldResolver := search.NewSimpleFieldResolver("*")
 

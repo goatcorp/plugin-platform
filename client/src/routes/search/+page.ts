@@ -29,5 +29,22 @@ export const load: PageLoad = async ({ url }) => {
 		}
 	}
 
-	return { results, authors, stats, query, page: records.page, totalPages: records.totalPages };
+	const pluginRecords = await backend.app.records.getFullList('plugins');
+	const plugins = pluginRecords
+		.map((record) => ({
+			id: record.id as string,
+			internal_name: record.internal_name as string,
+			name: record.name as string
+		}))
+		.sort((a, b) => a.name.localeCompare(b.name));
+
+	return {
+		results,
+		authors,
+		stats,
+		plugins,
+		query,
+		page: records.page,
+		totalPages: records.totalPages
+	};
 };
