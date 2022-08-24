@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import PresetCard from '$lib/components/PresetCard.svelte';
 	import { onMount } from 'svelte';
 	import { getSettings } from '$lib/settings';
 	import { connectBackend } from '$lib/backend';
+	import PresetCardGallery from '$lib/components/PresetCardGallery.svelte';
 
 	export let data: PageData;
 
@@ -38,61 +38,32 @@
 	<a href="/presets">Go to all presets</a>
 	<h2>Popular</h2>
 	<!--Presets with a high absolute number of views-->
-	<div class="gallery">
-		{#each data.popular as preset}
-			<div class="wrapper">
-				<PresetCard
-					{preset}
-					stats={data.stats[preset.id]}
-					authorName={data.authors[preset.author]}
-					{showSpoilers}
-				/>
-			</div>
-		{/each}
-	</div>
+	<PresetCardGallery
+		presets={data.popular}
+		stats={data.stats}
+		authors={data.authors}
+		{showSpoilers}
+	/>
 	<h2>Trending</h2>
 	<!--Presets with a high rate of growth over the past 24 hours-->
-	<div class="gallery">
-		{#each data.trending as preset}
-			<div class="wrapper">
-				<PresetCard
-					{preset}
-					stats={data.stats[preset.id]}
-					authorName={data.authors[preset.author]}
-					{showSpoilers}
-				/>
-			</div>
-		{/each}
-	</div>
+	<PresetCardGallery
+		presets={data.trending}
+		stats={data.stats}
+		authors={data.authors}
+		{showSpoilers}
+	/>
 	<h2>New</h2>
-	<div class="gallery">
-		{#each data.presets as preset}
-			<div class="wrapper">
-				<PresetCard
-					{preset}
-					stats={data.stats[preset.id]}
-					authorName={data.authors[preset.author]}
-					{showSpoilers}
-				/>
-			</div>
-		{/each}
-	</div>
+	<PresetCardGallery
+		presets={data.presets}
+		stats={data.stats}
+		authors={data.authors}
+		{showSpoilers}
+	/>
 </div>
 
 <style lang="scss">
 	* {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
 			'Open Sans', 'Helvetica Neue', sans-serif;
-	}
-
-	.gallery {
-		display: flex;
-		min-height: 50px;
-		flex-wrap: wrap;
-		justify-content: space-around;
-
-		.wrapper {
-			margin-bottom: 10px;
-		}
 	}
 </style>
