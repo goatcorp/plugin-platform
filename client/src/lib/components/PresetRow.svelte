@@ -7,6 +7,10 @@
 	export let showSpoilers: boolean;
 
 	const url = `/preset/${preset.id}`;
+	const thumbnail =
+		preset.thumbnail != ''
+			? `http://127.0.0.1:8090/api/files/presets/${preset.id}/${preset.thumbnail}`
+			: '';
 
 	let spoilerEnabled = preset.spoiler;
 
@@ -24,11 +28,27 @@
 </script>
 
 <div class="result-entry">
-	<div style="position: relative;">
+	<div class="thumbnail-wrapper" style="position: relative;">
 		{#if !showSpoilers && spoilerEnabled}
-			<div class="spoiler-overlay" on:click={(e) => dismissSpoiler(e.currentTarget)} />
+			<div
+				class="spoiler-overlay"
+				style={!showSpoilers && spoilerEnabled && thumbnail !== ''
+					? 'background-color: #ccc;'
+					: undefined}
+				on:click={(e) => dismissSpoiler(e.currentTarget)}
+			>
+				<div
+					class="thumbnail"
+					style={thumbnail ? `background-image: url(${thumbnail});` : undefined}
+				/>
+			</div>
 		{/if}
-		<a href={url}><div class="thumbnail" /></a>
+		<a href={url}>
+			<div
+				class={!showSpoilers && spoilerEnabled ? '' : 'thumbnail'}
+				style={thumbnail ? `background-image: url(${thumbnail});` : undefined}
+			/>
+		</a>
 	</div>
 	<div class="info">
 		<div class="basic">
@@ -80,11 +100,17 @@
 		border: 1px solid #ccc;
 		border-radius: 15px 10px 10px 15px; // Hides the left corners behind the thumbnail
 
+		.thumbnail-wrapper {
+			height: 100px;
+			width: 150px;
+		}
+
 		.thumbnail {
 			height: 100px;
 			width: 150px;
 
 			background-color: blue;
+			background-size: 150px;
 
 			border-radius: 10px 0 0 10px;
 		}
@@ -93,7 +119,7 @@
 			position: absolute;
 			width: 100%;
 			height: 100%;
-			filter: blur(1.5rem);
+			filter: blur(5px);
 			cursor: pointer;
 
 			animation-duration: 100ms;

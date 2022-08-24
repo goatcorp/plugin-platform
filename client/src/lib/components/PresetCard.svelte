@@ -7,6 +7,10 @@
 	export let showSpoilers: boolean;
 
 	const url = `/preset/${preset.id}`;
+	const thumbnail =
+		preset.thumbnail != ''
+			? `http://127.0.0.1:8090/api/files/presets/${preset.id}/${preset.thumbnail}`
+			: '';
 
 	let spoilerEnabled = preset.spoiler;
 
@@ -24,13 +28,27 @@
 </script>
 
 <div class="preset-card">
-	<div class="preview">
+	<div
+		class="preview"
+		style={!showSpoilers && spoilerEnabled && thumbnail !== ''
+			? 'background-color: #ccc;'
+			: undefined}
+	>
 		{#if !showSpoilers && spoilerEnabled}
-			<div class="spoiler-overlay" on:click={(e) => dismissSpoiler(e.currentTarget)} />
+			<div class="spoiler-overlay" on:click={(e) => dismissSpoiler(e.currentTarget)}>
+				<div
+					class="thumbnail"
+					style={thumbnail ? `background-image: url(${thumbnail});` : undefined}
+				/>
+			</div>
 		{/if}
 		<a href={url}>
-			<div class="thumbnail" />
+			<div
+				class={!showSpoilers && spoilerEnabled ? '' : 'thumbnail'}
+				style={thumbnail ? `background-image: url(${thumbnail});` : undefined}
+			/>
 		</a>
+
 		{#if preset.spoiler}
 			<div class="spoiler-notice-wrapper">
 				<span class="spoiler-notice">Spoiler</span>
@@ -94,13 +112,16 @@
 
 			.thumbnail {
 				height: 100%;
+				width: 100%;
+				border-radius: 10px 10px 0 0;
+				background-size: 300px;
 			}
 
 			.spoiler-overlay {
 				position: absolute;
 				width: 100%;
 				height: 100%;
-				filter: blur(1.5rem);
+				filter: blur(10px);
 				cursor: pointer;
 
 				animation-duration: 100ms;
