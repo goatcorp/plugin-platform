@@ -6,6 +6,7 @@
 	import type { Tag } from '$lib/tags';
 	import type { Plugin } from '$lib/plugins';
 	import { connectBackend } from '$lib/backend';
+	import TagSelector from '$lib/components/TagSelector.svelte';
 
 	export let data: PageData;
 
@@ -51,16 +52,21 @@
 		}
 	};
 
-	const addTag = (label: string) => {
-		if (!selectedTags.includes(label)) {
-			selectedTags.push(label);
+	const addTag = (tagId: string) => {
+		const tag = tagOptions.find((t) => t.id === tagId);
+		if (tag == null) {
+			return;
+		}
+
+		if (!selectedTags.includes(tag.label)) {
+			selectedTags.push(tag.label);
 			selectedTags = selectedTags;
 		}
 	};
 
-	const removeTag = (label: string) => {
-		if (selectedTags.includes(label)) {
-			selectedTags.splice(selectedTags.indexOf(label), 1);
+	const removeTag = (tagLabel: string) => {
+		if (selectedTags.includes(tagLabel)) {
+			selectedTags.splice(selectedTags.indexOf(tagLabel), 1);
 			selectedTags = selectedTags;
 		}
 	};
@@ -77,18 +83,13 @@
 
 <div>
 	<h2>Tags</h2>
-	{#each selectedTags as tag}
-		<div>
-			<button on:click={() => removeTag(tag)}>Remove</button>
-			<span>{tag}</span>
-		</div>
-	{/each}
-	<input type="text" style="display: block;" on:keyup={(e) => searchTags(e.currentTarget.value)} />
-	<select style="display: block;">
-		{#each tagOptions as tag}
-			<option value={tag.id} on:click={() => addTag(tag.label)}>{tag.label}</option>
-		{/each}
-	</select>
+	<TagSelector
+		tags={selectedTags}
+		{tagOptions}
+		onSearch={searchTags}
+		onAdd={addTag}
+		onRemove={removeTag}
+	/>
 
 	<h2>Plugin</h2>
 	<div>

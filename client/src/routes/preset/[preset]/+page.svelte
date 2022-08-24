@@ -5,6 +5,7 @@
 	import type { Tag } from '$lib/tags';
 	import type { Plugin } from '$lib/plugins';
 	import { connectBackend } from '$lib/backend';
+	import TagSelector from '$lib/components/TagSelector.svelte';
 
 	export let data: PageData;
 
@@ -112,8 +113,8 @@
 		}
 	};
 
-	const removeTag = async (tagId: string) => {
-		const tag = tags.find((t) => t.id === tagId);
+	const removeTag = async (tagLabel: string) => {
+		const tag = tags.find((t) => t.label === tagLabel);
 		if (tag == null) {
 			return;
 		}
@@ -121,7 +122,7 @@
 		const backend = connectBackend();
 		try {
 			const relation = await backend.app.records.getList('preset_tags', 1, 1, {
-				filter: `preset='${data.preset.id}' && tag='${tagId}'`
+				filter: `preset='${data.preset.id}' && tag='${tag.id}'`
 			});
 			if (relation.items.length === 0) {
 				console.error('No such tag found.');
@@ -130,7 +131,7 @@
 
 			await backend.app.records.delete('preset_tags', relation.items[0].id);
 			tags.splice(
-				tags.findIndex((tag) => tag.id === tagId),
+				tags.findIndex((t) => t.id === tag.id),
 				1
 			);
 			tags = tags; // Force reactivity
@@ -203,33 +204,18 @@
 
 	{#if user?.profile?.id === data.preset.author}
 		<a href={`/preset/${data.preset.id}/edit`}>Edit preset</a>
-		<div>
-			<input
-				type="text"
-				style="display: block;"
-				on:keyup={(e) => searchTags(e.currentTarget.value)}
-			/>
-			<select style="display: block;">
-				{#each tagOptions as tag}
-					<option value={tag.id} on:click={() => addTag(tag.id)}>{tag.label}</option>
-				{/each}
-			</select>
-		</div>
 	{/if}
 
 	<div>
 		<h2>Tags</h2>
-		{#each tags as tag}
-			<div style="display: flex;">
-				{#if user?.profile?.id === data.preset.author}
-					<button on:click={() => removeTag(tag.id)}>Remove</button>
-				{/if}
-				<div class="tag">{tag.label}</div>
-			</div>
-		{/each}
-		{#if tags.length === 0}
-			<span>No tags.</span>
-		{/if}
+		<TagSelector
+			readOnly={user?.profile?.id !== data.preset.author}
+			tags={tags.map((tag) => tag.label)}
+			{tagOptions}
+			onSearch={searchTags}
+			onAdd={addTag}
+			onRemove={removeTag}
+		/>
 
 		<h2>Plugin</h2>
 		<div>
