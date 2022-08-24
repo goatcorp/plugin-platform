@@ -41,15 +41,14 @@ For most changes, refer to the [PocketBase documentation](https://pocketbase.io/
 ### Schema modifications
 Open up the admin UI and make your changes, then run:
 ```sh
-cd server
-go run ./cmd/platform/main.go migrate collections
+cd server/pkg
+go run ../cmd/platform/main.go --dir="../pb_data" migrate collections
 ```
 
 Note that PocketBase uses SQLite (though I suspect this can be customized at the expense of having to configure another database),
 so certain features like schema-level permissions are not possible. These should instead be implemented through denormalization and
 application-level permissions.
 
-A migration should be generated in a new `migrations` folder. Move this into the corresponding package in the `pkg` directory.
 Migrations can be applied by running:
 ```sh
 cd server
