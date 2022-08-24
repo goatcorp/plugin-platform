@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import type { Tag } from '$lib/tags';
+	import type { Plugin } from '$lib/plugins';
 	import { connectBackend } from '$lib/backend';
 
 	export let data: PageData;
@@ -11,6 +12,18 @@
 	let isFavorite = data.isFavoriteInitial;
 	let tagOptions: Tag[] = [];
 	let tags: Tag[] = data.presetTags;
+	let plugins: Plugin[] = [];
+	let presetPlugin = data.presetPlugin;
+
+	const getPlugins = async () => {
+		const backend = connectBackend();
+		const pluggies = await backend.app.records.getFullList('plugins');
+		return pluggies.map((pluggy) => ({
+			id: pluggy.id,
+			internal_name: pluggy.internal_name,
+			name: pluggy.name
+		}));
+	};
 
 	const getTags = async (q: string) => {
 		const backend = connectBackend();
@@ -25,6 +38,50 @@
 			tagOptions = (await getTags(q)).filter(
 				(tag) => !data.presetTags.map((t) => t.id).includes(tag.id)
 			);
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
+	const unsetPlugin = async (pluginId: string) => {
+		const plugin = plugins.find((p) => p.id === pluginId);
+		if (plugin == null) {
+			return;
+		}
+
+		const backend = connectBackend();
+		try {
+			const relation = await backend.app.records.getList('preset_plugins', 1, 1, {
+				filter: `preset='${data.preset.id}' && plugin='${pluginId}'`
+			});
+			if (relation.items.length === 0) {
+				console.error('No such plugin found.');
+				return;
+			}
+
+			await backend.app.records.delete('preset_plugins', relation.items[0].id);
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
+	const setPlugin = async (pluginId: string) => {
+		const plugin = plugins.find((p) => p.id === pluginId);
+		if (plugin == null) {
+			return;
+		}
+
+		if (presetPlugin != null) {
+			await unsetPlugin(presetPlugin.id);
+		}
+
+		const backend = connectBackend();
+		try {
+			await backend.app.records.create('preset_plugins', {
+				preset: data.preset.id,
+				plugin: plugin.id
+			});
+			presetPlugin = plugin;
 		} catch (err) {
 			console.error(err);
 		}
@@ -128,6 +185,7 @@
 
 	onMount(async () => {
 		await loadCurrentUser();
+		plugins = await getPlugins();
 	});
 </script>
 
@@ -172,6 +230,24 @@
 		{#if tags.length === 0}
 			<span>No tags.</span>
 		{/if}
+
+		<h2>Plugin</h2>
+		<div>
+			{#if user?.profile?.id === data.preset.author}
+				<select>
+					<option value="" disabled selected={presetPlugin == null}>--Select a plugin--</option>
+					{#each plugins as plugin}
+						<option
+							value={plugin.id}
+							on:click={() => setPlugin(plugin.id)}
+							selected={presetPlugin?.id === plugin.id}>{plugin.name}</option
+						>
+					{/each}
+				</select>
+			{:else}
+				<span>{presetPlugin?.name}</span>
+			{/if}
+		</div>
 	</div>
 </div>
 

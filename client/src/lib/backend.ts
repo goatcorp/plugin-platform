@@ -2,6 +2,7 @@ import PocketBase from 'pocketbase';
 import type { Record as PocketBaseRecord } from 'pocketbase';
 import { Preset, type PresetStats } from './preset';
 import type { Tag } from './tags';
+import type { Plugin } from './plugins';
 
 interface ListResult<M> {
 	page: number;
@@ -71,6 +72,20 @@ export class Backend {
 		}
 
 		return presetTags;
+	}
+
+	async fetchPresetPlugin(presetId: string): Promise<Plugin | null> {
+		const presetPlugins = (
+			await this.app.records.getFullList('preset_plugins', undefined, {
+				filter: `preset='${presetId}'`,
+				expand: 'plugin'
+			})
+		).map((record) => {
+			const { id, internal_name, name } = record['@expand'].plugin;
+			return { id, internal_name, name };
+		});
+
+		return presetPlugins.length > 0 ? presetPlugins[0] : null;
 	}
 
 	async fetchProfileFavoritePresets(profileId: string): Promise<Record<string, Preset>> {

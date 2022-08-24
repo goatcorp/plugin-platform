@@ -19,6 +19,7 @@ export const load: PageLoad = async ({ params }) => {
 
 	const presetStats = await backend.fetchPresetStats(id);
 	const presetTags = await backend.fetchPresetTags(id);
+	const presetPlugin = await backend.fetchPresetPlugin(id);
 
 	const user = backend.getCurrentUser();
 	const isFavoriteInitial = user?.profile
@@ -27,5 +28,13 @@ export const load: PageLoad = async ({ params }) => {
 
 	const authorName = (await backend.app.records.getOne('profiles', preset.author)).name;
 
-	return { preset, presetData, presetStats, presetTags, authorName, isFavoriteInitial };
+	return {
+		preset,
+		presetData,
+		presetStats,
+		presetTags,
+		presetPlugin,
+		authorName,
+		isFavoriteInitial
+	};
 };
