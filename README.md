@@ -32,8 +32,11 @@ To add new login options, PR changes to [PocketBase](https://github.com/pocketba
 Open up the admin UI and go to the **Collections** page. Select a collection and add a record.
 Users can be added manually under the **Users** page, or by going through the standard registration process.
 
+### Frontend development
+For most changes, refer to the [SvelteKit documentation](https://kit.svelte.dev/docs/introduction).
+
 ### Backend development
-For most changes, refer to the [PocketBase documentation](https://pocketbase.io/docs). For the other changes, don't.
+For most changes, refer to the [PocketBase documentation](https://pocketbase.io/docs).
 
 ### Schema modifications
 Open up the admin UI and make your changes, then run:
