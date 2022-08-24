@@ -3,8 +3,6 @@ import type { PageLoad } from './$types';
 import { connectBackend } from '$lib/backend';
 
 export const load: PageLoad = async ({ url }) => {
-	const query = url.searchParams.get('q') || '';
-
 	const backend = connectBackend();
 
 	const searchParams: Record<string, string> = {};
@@ -38,12 +36,17 @@ export const load: PageLoad = async ({ url }) => {
 		}))
 		.sort((a, b) => a.name.localeCompare(b.name));
 
+	const params: Record<string, string | undefined> = {};
+	for (const [k, v] of url.searchParams.entries()) {
+		params[k] = v;
+	}
+
 	return {
 		results,
 		authors,
 		stats,
 		plugins,
-		query,
+		params,
 		page: records.page,
 		totalPages: records.totalPages
 	};

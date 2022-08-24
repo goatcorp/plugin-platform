@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { getSettings } from '$lib/settings';
 	import { connectBackend } from '$lib/backend';
+	import PageSelector from '$lib/components/PageSelector.svelte';
 
 	export let data: PageData;
 
@@ -33,19 +34,7 @@
 	{/each}
 </div>
 
-<div>
-	{#if data.page > 1}
-		<a href={`?page=${data.page - 1}`}>Previous</a>
-	{:else}
-		<a href={`?page=${data.page - 1}`} disabled tabindex="-1">Previous</a>
-	{/if}
-	<a href={`?page=${data.page}`} disabled tabindex="-1">{data.page}</a>
-	{#if data.page < data.totalPages}
-		<a href={`?page=${data.page + 1}`}>Next</a>
-	{:else}
-		<a href={`?page=${data.page + 1}`} disabled tabindex="-1">Next</a>
-	{/if}
-</div>
+<PageSelector page={data.page} totalPages={data.totalPages} />
 
 <style lang="scss">
 	* {
@@ -55,11 +44,5 @@
 
 	.gap {
 		height: 15px;
-	}
-
-	a[disabled] {
-		pointer-events: none;
-		text-decoration: none;
-		color: inherit;
 	}
 </style>

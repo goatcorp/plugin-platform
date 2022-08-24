@@ -37,5 +37,18 @@ export const load: PageLoad = async ({ url }) => {
 		}))
 		.sort((a, b) => a.name.localeCompare(b.name));
 
-	return { presets, authors, stats, plugins, page: records.page, totalPages: records.totalPages };
+	const params: Record<string, string | undefined> = {};
+	for (const [k, v] of url.searchParams.entries()) {
+		params[k] = v;
+	}
+
+	return {
+		presets,
+		authors,
+		stats,
+		plugins,
+		params,
+		page: records.page,
+		totalPages: records.totalPages
+	};
 };

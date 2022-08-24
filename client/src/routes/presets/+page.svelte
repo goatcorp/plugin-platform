@@ -7,46 +7,28 @@
 	import type { Plugin } from '$lib/plugins';
 	import { connectBackend } from '$lib/backend';
 	import TagSelector from '$lib/components/TagSelector.svelte';
+	import PageSelector from '$lib/components/PageSelector.svelte';
+	import PluginSelector from '$lib/components/PluginSelector.svelte';
 
 	export let data: PageData;
 
 	let showSpoilers = false;
 	let tagOptions: Tag[] = [];
 
-	let selectedTags: string[] =
-		typeof location !== 'undefined'
-			? (() => {
-					const url = new URL(location.toString());
-					const tags = url.searchParams.get('tags');
-					if (tags != null && tags.length > 0) {
-						return tags.split(',');
-					}
-
-					return [];
-			  })()
-			: [];
-	let selectedPlugin: Plugin | null =
-		typeof location !== 'undefined'
-			? (() => {
-					const url = new URL(location.toString());
-					const plugin = url.searchParams.get('plugin');
-					const found = data.plugins.find((p) => p.internal_name === plugin);
-					return found || null;
-			  })()
-			: null;
-
-	const getTags = async (q: string) => {
-		const backend = connectBackend();
-		const tags = await backend.app.records.getList('tags', 1, 10, {
-			filter: `label~'${q}'`
-		});
-		return tags.items.map((record) => ({ id: record.id, label: record.label }));
-	};
+	let selectedTags: string[] = (() => {
+		const tags = data.params.tags;
+		return tags != null && tags.length > 0 ? tags.split(',') : [];
+	})();
+	let selectedPlugin: Plugin | null | undefined = (() => {
+		const plugin = data.params.plugin;
+		const found = data.plugins.find((p) => p.internal_name === plugin);
+		return found || null;
+	})();
 
 	const searchTags = async (q: string) => {
+		const backend = connectBackend();
 		try {
-			console.log(selectedTags);
-			tagOptions = (await getTags(q)).filter((tag) => !selectedTags.includes(tag.label));
+			tagOptions = (await backend.searchTags(q)).filter((tag) => !selectedTags.includes(tag.label));
 		} catch (err) {
 			console.error(err);
 		}
@@ -92,18 +74,11 @@
 	/>
 
 	<h2>Plugin</h2>
-	<div>
-		<select>
-			<option value="" disabled selected={selectedPlugin == null}>--Select a plugin--</option>
-			{#each data.plugins as plugin}
-				<option
-					value={plugin.id}
-					on:click={() => (selectedPlugin = plugin)}
-					selected={selectedPlugin?.id === plugin.id}>{plugin.name}</option
-				>
-			{/each}
-		</select>
-	</div>
+	<PluginSelector
+		plugins={data.plugins}
+		{selectedPlugin}
+		onSet={(plugin) => (selectedPlugin = plugin)}
+	/>
 
 	<button
 		on:click={() => {
@@ -126,29 +101,11 @@
 	{/each}
 </div>
 
-<div>
-	{#if data.page > 1}
-		<a href={`?page=${data.page - 1}`}>Previous</a>
-	{:else}
-		<a href={`?page=${data.page - 1}`} disabled tabindex="-1">Previous</a>
-	{/if}
-	<a href={`?page=${data.page}`} disabled tabindex="-1">{data.page}</a>
-	{#if data.page < data.totalPages}
-		<a href={`?page=${data.page + 1}`}>Next</a>
-	{:else}
-		<a href={`?page=${data.page + 1}`} disabled tabindex="-1">Next</a>
-	{/if}
-</div>
+<PageSelector page={data.page} totalPages={data.totalPages} />
 
 <style lang="scss">
 	* {
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
 			'Open Sans', 'Helvetica Neue', sans-serif;
-	}
-
-	a[disabled] {
-		pointer-events: none;
-		text-decoration: none;
-		color: inherit;
 	}
 </style>

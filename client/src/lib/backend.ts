@@ -39,6 +39,58 @@ export class Backend {
 		}
 	}
 
+	async addPresetTagById(presetId: string, tagId: string) {
+		await this.app.records.create('preset_tags', {
+			preset: presetId,
+			tag: tagId
+		});
+	}
+
+	async addPresetTagByLabel(presetId: string, tagLabel: string) {
+		const tagsWithLabel = await this.app.records.getList('tags', 1, 1, {
+			filter: `label='${tagLabel}'`
+		});
+
+		if (tagsWithLabel.items.length === 0) {
+			throw new Error('Tag not found.');
+		}
+
+		await this.app.records.create('preset_tags', {
+			preset: presetId,
+			tag: tagsWithLabel.items[0].id
+		});
+	}
+
+	async removePresetTagById(presetId: string, tagId: string) {
+		const relations = await this.app.records.getFullList('preset_tags', undefined, {
+			filter: `preset='${presetId}' && tag='${tagId}'`
+		});
+
+		for (const relation of relations) {
+			await this.app.records.delete('preset_tags', relation.id);
+		}
+	}
+
+	async removePresetTagByLabel(presetId: string, tagLabel: string) {
+		const relations = await this.app.records.getFullList('preset_tags', undefined, {
+			filter: `preset='${presetId}'`,
+			expand: 'tag'
+		});
+
+		for (const relation of relations) {
+			if (relation['@expand'].tag.label === tagLabel) {
+				await this.app.records.delete('preset_tags', relation.id);
+			}
+		}
+	}
+
+	async searchTags(query: string): Promise<Tag[]> {
+		const tags = await this.app.records.getList('tags', 1, 10, {
+			filter: `label~'${query}'`
+		});
+		return tags.items.map((record) => ({ id: record.id, label: record.label }));
+	}
+
 	async fetchPresetStats(presetId: string): Promise<PresetStats> {
 		const records = await this.app.records.getFullList('preset_stats', undefined, {
 			filter: `preset='${presetId}'`

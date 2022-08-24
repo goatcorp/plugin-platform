@@ -6,6 +6,7 @@
 	import type { Plugin } from '$lib/plugins';
 	import { connectBackend } from '$lib/backend';
 	import TagSelector from '$lib/components/TagSelector.svelte';
+	import PluginSelector from '$lib/components/PluginSelector.svelte';
 
 	export let data: PageData;
 
@@ -14,7 +15,7 @@
 	let tagOptions: Tag[] = [];
 	let tags: Tag[] = data.presetTags;
 	let plugins: Plugin[] = [];
-	let presetPlugin = data.presetPlugin;
+	let presetPlugin: Plugin | null | undefined = data.presetPlugin;
 
 	const getPlugins = async () => {
 		const backend = connectBackend();
@@ -26,17 +27,10 @@
 		}));
 	};
 
-	const getTags = async (q: string) => {
-		const backend = connectBackend();
-		const tags = await backend.app.records.getList('tags', 1, 10, {
-			filter: `label~'${q}'`
-		});
-		return tags.items.map((record) => ({ id: record.id, label: record.label }));
-	};
-
 	const searchTags = async (q: string) => {
+		const backend = connectBackend();
 		try {
-			tagOptions = (await getTags(q)).filter(
+			tagOptions = (await backend.searchTags(q)).filter(
 				(tag) => !data.presetTags.map((t) => t.id).includes(tag.id)
 			);
 		} catch (err) {
@@ -66,29 +60,34 @@
 		}
 	};
 
-	const setPlugin = async (pluginId: string) => {
-		const plugin = plugins.find((p) => p.id === pluginId);
-		if (plugin == null) {
-			return;
-		}
-
+	const setPlugin = async (plugin: Plugin | null | undefined) => {
 		if (presetPlugin != null) {
 			await unsetPlugin(presetPlugin.id);
 		}
 
 		const backend = connectBackend();
 		try {
-			await backend.app.records.create('preset_plugins', {
-				preset: data.preset.id,
-				plugin: plugin.id
-			});
+			if (plugin != null) {
+				await backend.app.records.create('preset_plugins', {
+					preset: data.preset.id,
+					plugin: plugin.id
+				});
+			} else {
+				const relations = await backend.app.records.getFullList('preset_plugins', undefined, {
+					filter: `preset='${data.preset.id}'`
+				});
+				for (const relation of relations) {
+					await backend.app.records.delete('preset_plugins', relation.id);
+				}
+			}
+
 			presetPlugin = plugin;
 		} catch (err) {
 			console.error(err);
 		}
 	};
 
-	const addTag = async (tagId: string) => {
+	const addTagById = async (tagId: string) => {
 		const tag = tagOptions.find((t) => t.id === tagId);
 		if (tag == null) {
 			return;
@@ -96,10 +95,7 @@
 
 		const backend = connectBackend();
 		try {
-			await backend.app.records.create('preset_tags', {
-				preset: data.preset.id,
-				tag: tag.id
-			});
+			await backend.addPresetTagById(data.preset.id, tag.id);
 			tags.push(tag);
 			tags = tags; // Force reactivity
 
@@ -113,7 +109,7 @@
 		}
 	};
 
-	const removeTag = async (tagLabel: string) => {
+	const removeTagByLabel = async (tagLabel: string) => {
 		const tag = tags.find((t) => t.label === tagLabel);
 		if (tag == null) {
 			return;
@@ -121,15 +117,7 @@
 
 		const backend = connectBackend();
 		try {
-			const relation = await backend.app.records.getList('preset_tags', 1, 1, {
-				filter: `preset='${data.preset.id}' && tag='${tag.id}'`
-			});
-			if (relation.items.length === 0) {
-				console.error('No such tag found.');
-				return;
-			}
-
-			await backend.app.records.delete('preset_tags', relation.items[0].id);
+			await backend.removePresetTagByLabel(data.preset.id, tagLabel);
 			tags.splice(
 				tags.findIndex((t) => t.id === tag.id),
 				1
@@ -213,27 +201,17 @@
 			tags={tags.map((tag) => tag.label)}
 			{tagOptions}
 			onSearch={searchTags}
-			onAdd={addTag}
-			onRemove={removeTag}
+			onAdd={addTagById}
+			onRemove={removeTagByLabel}
 		/>
 
 		<h2>Plugin</h2>
-		<div>
-			{#if user?.profile?.id === data.preset.author}
-				<select>
-					<option value="" disabled selected={presetPlugin == null}>--Select a plugin--</option>
-					{#each plugins as plugin}
-						<option
-							value={plugin.id}
-							on:click={() => setPlugin(plugin.id)}
-							selected={presetPlugin?.id === plugin.id}>{plugin.name}</option
-						>
-					{/each}
-				</select>
-			{:else}
-				<span>{presetPlugin?.name}</span>
-			{/if}
-		</div>
+		<PluginSelector
+			{plugins}
+			selectedPlugin={presetPlugin}
+			readOnly={user?.profile?.id !== data.preset.author}
+			onSet={setPlugin}
+		/>
 	</div>
 </div>
 
