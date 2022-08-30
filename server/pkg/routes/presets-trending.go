@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"fmt"
+
 	"github.com/labstack/echo/v5"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase"
@@ -20,9 +22,18 @@ func BuildTrendingPresetsHandler(app *pocketbase.PocketBase) func(echo.Context) 
 			InnerJoin("(SELECT * FROM preset_stats WHERE date >= date('now', '-1 day')) AS recent", dbx.NewExp("presets.id = recent.preset")).
 			GroupBy("recent.preset").
 			OrderBy("recent.views DESC")
+
+		// The search provider replaces the SELECT field with a COUNT(*) when using pagination to determine
+		// the total number of records in the result set. However, when using GROUP BY, this actually counts
+		// the number of subrows in each group, returning each count as a separate row. When there are no
+		// groups, no rows are returned, which causes the query to fail. To work around this, we need to use
+		// a wrapper query that maintains the aggregation of the inner query.
+		queryWrap := app.Dao().DB().
+			Select("*").
+			From(fmt.Sprintf("(%s)", query.Build().SQL()))
 		fieldResolver := search.NewSimpleFieldResolver("*")
 
-		result, err := search.NewProvider(fieldResolver).Query(query).Exec(&presets)
+		result, err := search.NewProvider(fieldResolver).Query(queryWrap).Exec(&presets)
 		if err != nil {
 			return err
 		}
