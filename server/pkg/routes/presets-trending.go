@@ -16,10 +16,14 @@ func BuildTrendingPresetsHandler(app *pocketbase.PocketBase) func(echo.Context) 
 		var presets []*entity.Preset
 
 		// Return the presets ordered only by today's views
+		queryRecent := app.Dao().DB().
+			Select("*").
+			From("preset_stats").
+			Where(dbx.NewExp("date >= date('now', '-1 day')"))
 		query := app.Dao().DB().
 			Select("presets.*", "SUM(views)").
 			From("presets").
-			InnerJoin("(SELECT * FROM preset_stats WHERE date >= date('now', '-1 day')) AS recent", dbx.NewExp("presets.id = recent.preset")).
+			InnerJoin(fmt.Sprintf("(%s) AS recent", queryRecent.Build().SQL()), dbx.NewExp("presets.id = recent.preset")).
 			GroupBy("recent.preset").
 			OrderBy("recent.views DESC")
 
