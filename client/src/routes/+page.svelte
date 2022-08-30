@@ -18,12 +18,6 @@
 </script>
 
 <div>
-	<h1>Dalamud Plugin Presets</h1>
-	<!--Plugins themselves will come later-->
-	<p>We have cool presets</p>
-</div>
-
-<div>
 	<h1>Search</h1>
 	<div>
 		<form method="get" action="/search">
