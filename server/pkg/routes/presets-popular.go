@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"fmt"
+
 	"github.com/labstack/echo/v5"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase"
@@ -23,9 +25,14 @@ func BuildPopularPresetsHandler(app *pocketbase.PocketBase) func(echo.Context) e
 			InnerJoin("preset_stats", dbx.NewExp("presets.id = preset_stats.preset")).
 			GroupBy("preset_stats.preset").
 			OrderBy("views DESC")
+
+		// See BuildTrendingPresetsHandler for an explanation of this hack
+		queryWrap := app.Dao().DB().
+			Select("*").
+			From(fmt.Sprintf("(%s)", query.Build().SQL()))
 		fieldResolver := search.NewSimpleFieldResolver("*")
 
-		result, err := search.NewProvider(fieldResolver).Query(query).Exec(&presets)
+		result, err := search.NewProvider(fieldResolver).Query(queryWrap).Exec(&presets)
 		if err != nil {
 			return err
 		}
