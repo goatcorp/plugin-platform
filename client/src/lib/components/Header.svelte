@@ -3,6 +3,7 @@
 	import { connectBackend } from '$lib/backend';
 	import type { User } from 'pocketbase';
 	import { onMount } from 'svelte';
+	import UserMenu from './UserMenu.svelte';
 
 	let user: User | null = null;
 
@@ -32,13 +33,11 @@
 				</form>
 			</div>
 		</div>
-		{#if user == null}
+		{#if user?.profile == null}
 			<a href="/login">Log in</a>
 		{:else}
-			<a href="/logout">Log out</a>
 			<a href="/create">Create</a>
-			<a href="/settings">Settings</a>
-			<a href={`/user/${user.profile?.id}`}>{user.profile?.name}</a>
+			<UserMenu id={user.profile.id} username={user.profile.name} />
 		{/if}
 	</div>
 </nav>
@@ -54,7 +53,8 @@
 			justify-content: right;
 
 			> * {
-				margin-left: 8px;
+				margin-right: 4px;
+				margin-left: 4px;
 			}
 		}
 
