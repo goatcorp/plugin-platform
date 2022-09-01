@@ -4,6 +4,7 @@
 	import { getSettings } from '$lib/settings';
 	import { connectBackend } from '$lib/backend';
 	import PresetCardGallery from '$lib/components/PresetCardGallery.svelte';
+	import { SearchIcon } from 'svelte-feather-icons';
 
 	export let data: PageData;
 
@@ -22,7 +23,7 @@
 	<div>
 		<form method="get" action="/search">
 			<input type="search" placeholder="Search for presets..." name="q" />
-			<button>Search</button>
+			<button><SearchIcon /></button>
 		</form>
 	</div>
 </div>

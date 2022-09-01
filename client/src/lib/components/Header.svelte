@@ -4,6 +4,7 @@
 	import type { User } from 'pocketbase';
 	import { onMount } from 'svelte';
 	import UserMenu from './UserMenu.svelte';
+	import { SearchIcon } from 'svelte-feather-icons';
 
 	let user: User | null = null;
 
@@ -29,7 +30,7 @@
 			<div>
 				<form method="get" action="/search">
 					<input type="search" placeholder="Search for presets..." name="q" />
-					<button>Search</button>
+					<button><SearchIcon /></button>
 				</form>
 			</div>
 		</div>
