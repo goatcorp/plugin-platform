@@ -1,7 +1,7 @@
 .DS_Store
 
 *.exe
-/pb_data
+pb_data/
 
 .env
 .env.*

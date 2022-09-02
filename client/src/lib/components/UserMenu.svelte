@@ -2,7 +2,6 @@
 	import { UserIcon } from 'svelte-feather-icons';
 
 	export let id: string;
-	export let username: string;
 
 	let open = false;
 
@@ -23,7 +22,7 @@
 	<div class="mount-point">
 		{#if open}
 			<div class="user-menu">
-				<a href={`/user/${id}`} on:click={closeMenu}>{username}</a>
+				<a href={`/user/${id}`} on:click={closeMenu}>My account</a>
 				<a href="/settings" on:click={closeMenu}>Settings</a>
 				<a href="/logout" on:click={closeMenu}>Log out</a>
 			</div>

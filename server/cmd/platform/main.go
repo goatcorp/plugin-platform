@@ -69,8 +69,6 @@ func main() {
 		return nil
 	})
 
-	app.OnUserAfterOauth2Register().Add(events.BuildOauth2AddUsernameHandler(app))
-
 	app.OnRecordAfterCreateRequest().Add(events.BuildPresetCreateAddStatsHandler(app))
 
 	app.OnRecordViewRequest().Add(events.BuildPresetViewUpdateStatsHandler(app))
