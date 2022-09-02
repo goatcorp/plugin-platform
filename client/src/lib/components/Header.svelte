@@ -38,7 +38,7 @@
 			<a href="/login">Log in</a>
 		{:else}
 			<a href="/create">Create</a>
-			<UserMenu id={user.profile.id} username={user.profile.name} />
+			<UserMenu id={user.profile.id} />
 		{/if}
 	</div>
 </nav>
