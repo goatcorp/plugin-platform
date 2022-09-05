@@ -3,7 +3,7 @@ services:
   web:
     build: ../client
     ports:
-      - "6000:3000"
+      - "7000:3000"
     depends_on:
       - backend
     environment:
@@ -12,6 +12,6 @@ services:
   backend:
     build: ../server
     ports:
-      - "6001:8090"
+      - "7001:8090"
     volumes:
       - "./pb_data:/pb_data:rw"
