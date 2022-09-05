@@ -1,16 +1,18 @@
 version: "3.9"
 services:
   web:
-    build: ../client
+    build:
+      context: ../client
+      args: # These URLs must not be quoted.
+        - VITE_API_ADDRESS=http://backend:8090
+        - VITE_PUBLIC_API_ADDRESS=http://localhost:7001
     ports:
       - "7000:3000"
     depends_on:
       - backend
-    environment:
-      - VITE_API_ADDRESS="http://backend:8090"
-      - VITE_PUBLIC_API_ADDRESS="http://backend:8090"
   backend:
-    build: ../server
+    build:
+      context: ../server
     ports:
       - "7001:8090"
     volumes:
