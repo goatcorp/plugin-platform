@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  web:
+    build: client
+    ports:
+      - "5000:3000"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_ADDRESS="http://backend:8090"
+      - VITE_PUBLIC_API_ADDRESS="http://backend:8090"
+  backend:
+    build: server
+    ports:
+      - "5001:8090"
+    volumes:
+      - "./pb_data:/pb_data:rw"
