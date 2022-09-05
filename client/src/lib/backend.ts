@@ -196,5 +196,11 @@ export class Backend {
 type ConnectBackend = () => Backend;
 
 export const connectBackend: ConnectBackend = () => {
-	return new Backend('http://127.0.0.1:8090');
+	// Dynamic environment variables are temporarily broken on Windows.
+	// https://github.com/sveltejs/kit/issues/6361
+	return new Backend(
+		typeof window !== 'undefined'
+			? import.meta.env.VITE_PUBLIC_API_ADDRESS
+			: import.meta.env.VITE_API_ADDRESS
+	);
 };
