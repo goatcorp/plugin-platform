@@ -14,8 +14,8 @@ FROM node:18.8-bullseye-slim
 
 WORKDIR /app
 
-COPY --from=base /app/build build
-COPY package.json .
+COPY --from=base /app .
+COPY . .
 
 EXPOSE 3000
 CMD ["node", "./build"]
