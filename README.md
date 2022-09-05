@@ -7,6 +7,8 @@ Dependencies:
 * Yarn v1.22.18+
 * Go v1.19+
 
+Copy `/client/.env.example` into `/client/.env.local`.
+
 Shell 1:
 ```sh
 cd server

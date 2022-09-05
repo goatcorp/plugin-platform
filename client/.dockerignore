@@ -6,3 +6,5 @@ Dockerfile*
 public
 .svelte-kit
 build
+.env.example
+.env.local
