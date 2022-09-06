@@ -27,7 +27,7 @@ services:
   certbot:
     image: certbot/certbot
     volumes:
-      - "${HOME}/certbot/www:/var/www/certbot/:ro"
+      - "${HOME}/certbot/www:/var/www/certbot/:rw"
   watchtower:
     image: containrrr/watchtower
     environment:
