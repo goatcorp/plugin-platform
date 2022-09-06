@@ -21,7 +21,7 @@ services:
     ports:
       - "7001:8090"
     volumes:
-      - "${HOME}/pb_data:/pb_data:rw"
+      - "pb_data:/pb_data:rw"
   watchtower:
     image: containrrr/watchtower
     environment:
@@ -30,3 +30,5 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "${HOME}/.docker/config.json:/config.json:ro"
     command: --interval 30
+volumes:
+  pb_data:
