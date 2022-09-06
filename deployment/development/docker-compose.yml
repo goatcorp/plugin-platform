@@ -1,5 +1,18 @@
 version: "3.9"
 services:
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf:ro"
+      - "${HOME}/certbot/www:/var/www/certbot/:ro"
+      - "${HOME}/certbot/conf/:/etc/nginx/ssl/:ro"
+    depends_on:
+      - platform
+      - platform-api
   platform:
     image: ghcr.io/goatcorp/plugin-platform-client:latest
     ports:
@@ -12,6 +25,11 @@ services:
       - "7001:8090"
     volumes:
       - "${HOME}/pb_data:/pb_data:rw"
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - "${HOME}/certbot/www:/var/www/certbot/:rw"
+      - "${HOME}/certbot/conf/:/etc/letsencrypt/:rw"
   watchtower:
     image: containrrr/watchtower
     environment:
