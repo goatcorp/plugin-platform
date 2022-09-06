@@ -29,7 +29,7 @@ services:
     image: certbot/certbot
     volumes:
       - "${HOME}/certbot/www:/var/www/certbot/:rw"
-      - "${HOME}/certbot/conf/:/etc/letsencrypt/ssl/:rw"
+      - "${HOME}/certbot/conf/:/etc/letsencrypt/:rw"
   watchtower:
     image: containrrr/watchtower
     environment:
