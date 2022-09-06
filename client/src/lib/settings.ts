@@ -1,4 +1,3 @@
-import PocketBase from 'pocketbase';
 import { connectBackend } from './backend';
 
 export interface Settings {
