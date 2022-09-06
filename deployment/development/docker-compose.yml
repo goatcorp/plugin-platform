@@ -9,6 +9,7 @@ services:
     volumes:
       - "./nginx.conf:/etc/nginx/nginx.conf:ro"
       - "${HOME}/certbot/www:/var/www/certbot/:ro"
+      - "${HOME}/certbot/conf/:/etc/nginx/ssl/:ro"
     depends_on:
       - platform
       - platform-api
@@ -28,6 +29,7 @@ services:
     image: certbot/certbot
     volumes:
       - "${HOME}/certbot/www:/var/www/certbot/:rw"
+      - "${HOME}/certbot/conf/:/etc/nginx/ssl/:rw"
   watchtower:
     image: containrrr/watchtower
     environment:
