@@ -1,12 +1,13 @@
 import PocketBase from 'pocketbase';
+import { connectBackend } from './backend';
 
 export interface Settings {
 	show_spoilers: boolean;
 }
 
 export async function getSettings(userId?: string | null | undefined): Promise<Settings> {
-	const client = new PocketBase('http://127.0.0.1:8090');
-	const settings = await client.records.getFullList('user_settings');
+	const backend = connectBackend();
+	const settings = await backend.app.records.getFullList('user_settings');
 	if (settings.length === 0) {
 		const newSettings: Settings = {
 			show_spoilers: false
@@ -14,7 +15,7 @@ export async function getSettings(userId?: string | null | undefined): Promise<S
 
 		if (userId != null) {
 			try {
-				await client.records.create('user_settings', { ...newSettings, user: userId });
+				await backend.app.records.create('user_settings', { ...newSettings, user: userId });
 			} catch (err) {
 				console.error(err);
 			}
@@ -29,10 +30,10 @@ export async function getSettings(userId?: string | null | undefined): Promise<S
 }
 
 export async function updateSettings(settings: Partial<Settings>): Promise<void> {
-	const client = new PocketBase('http://127.0.0.1:8090');
-	const existing = (await client.records.getFullList('user_settings'))[0];
+	const backend = connectBackend();
+	const existing = (await backend.app.records.getFullList('user_settings'))[0];
 	try {
-		await client.records.update('user_settings', existing.id, settings);
+		await backend.app.records.update('user_settings', existing.id, settings);
 	} catch (err) {
 		console.error(err);
 	}
