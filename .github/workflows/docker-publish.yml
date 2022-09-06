@@ -71,7 +71,7 @@ jobs:
           context: './client'
           build-args: |
             VITE_API_ADDRESS=http://platform-api:8090
-            VITE_PUBLIC_API_ADDRESS=http://platform.karashiiro.moe:7001
+            VITE_PUBLIC_API_ADDRESS=http://platform.karashiiro.moe
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta_client.outputs.tags }}
           labels: ${{ steps.meta_client.outputs.labels }}
