@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  platform:
+    image: ghcr.io/goatcorp/plugin-platform-client:latest
+    ports:
+      - "7000:3000"
+    depends_on:
+      - platform-api
+  platform-api:
+    image: ghcr.io/goatcorp/plugin-platform-server:latest
+    ports:
+      - "7001:8090"
+    volumes:
+      - "${HOME}/pb_data:/pb_data:rw"
+  watchtower:
+    image: containrrr/watchtower
+    environment:
+      WATCHTOWER_ROLLING_RESTART: "true"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${HOME}/.docker/config.json:/config.json:ro"
+    command: --interval 30
