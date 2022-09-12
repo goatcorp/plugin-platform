@@ -16,6 +16,8 @@ go run ./cmd/platform/main.go migrate up
 go run ./cmd/platform/main.go serve
 ```
 
+Navigate to the admin UI and create an admin account. Create an application in the Discord Developer Portal and copy the application's client ID and client secret into the authentication settings in the admin UI. Make sure to add `http://YOUR_LOCALHOST_URL/oauth2/redirect` to the OAuth2 redirects.
+
 Shell 2:
 ```sh
 cd client
