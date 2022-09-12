@@ -17,6 +17,7 @@ go run ./cmd/platform/main.go serve
 ```
 
 Navigate to the admin UI and create an admin account. Create an application in the Discord Developer Portal and copy the application's client ID and client secret into the authentication settings in the admin UI. Make sure to add `http://YOUR_LOCALHOST_URL/oauth2/redirect` to the OAuth2 redirects.
+Please use `localhost` for local development - do not use `0.0.0.0` since Discord doesn't support that.
 
 Shell 2:
 ```sh
