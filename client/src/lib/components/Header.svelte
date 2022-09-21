@@ -1,5 +1,4 @@
 <script lang="ts">
-	import 'normalize.css';
 	import { connectBackend } from '$lib/backend';
 	import type { User } from 'pocketbase';
 	import { onMount } from 'svelte';
@@ -23,44 +22,25 @@
 	});
 </script>
 
-<nav>
-	<div><a href="/">Dalamud Plugin Presets</a></div>
-	<div class="controls">
-		<div class="search">
-			<div>
-				<form method="get" action="/search">
-					<input type="search" placeholder="Search for presets..." name="q" />
-					<button><SearchIcon /></button>
-				</form>
-			</div>
-		</div>
+<nav class="flex justify-between">
+	<a href="/" class="btn btn-primary">Dalamud Plugin Presets</a>
+	<div class="flex justify-end">
+		<form method="get" action="/search" class="mr-1">
+			<label class="input-group">
+				<input
+					type="search"
+					placeholder="Search for presets..."
+					name="q"
+					class="input input-sm input-bordered input-primary w-full max-w-xs"
+				/>
+				<button class="btn btn-sm"><SearchIcon /></button>
+			</label>
+		</form>
 		{#if user?.profile == null}
-			<a href="/login">Log in</a>
+			<a href="/login" class="btn btn-sm">Log in</a>
 		{:else}
-			<a href="/create">Create</a>
+			<a href="/create" class="btn btn-sm btn-accent mr-1">Create</a>
 			<UserMenu id={user.profile.id} />
 		{/if}
 	</div>
 </nav>
-
-<style lang="scss">
-	nav {
-		padding: 35px;
-		display: flex;
-		justify-content: space-between;
-
-		.controls {
-			display: flex;
-			justify-content: right;
-
-			> * {
-				margin-right: 4px;
-				margin-left: 4px;
-			}
-		}
-
-		.search {
-			display: flex;
-		}
-	}
-</style>

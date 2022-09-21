@@ -5,22 +5,14 @@
 
 <div>
 	{#if page > 1}
-		<a href={`?page=${page - 1}`}>Previous</a>
+		<a href={`?page=${page - 1}`} class="link link-primary">Previous</a>
 	{:else}
-		<a href={`?page=${page - 1}`} disabled tabindex="-1">Previous</a>
+		<a href={`?page=${page - 1}`} class="pointer-events-none" tabindex="-1">Previous</a>
 	{/if}
-	<a href={`?page=${page}`} disabled tabindex="-1">{page}</a>
+	<a href={`?page=${page}`} class="pointer-events-none" tabindex="-1">{page}</a>
 	{#if page < totalPages}
-		<a href={`?page=${page + 1}`}>Next</a>
+		<a href={`?page=${page + 1}`} class="link link-primary">Next</a>
 	{:else}
-		<a href={`?page=${page + 1}`} disabled tabindex="-1">Next</a>
+		<a href={`?page=${page + 1}`} class="pointer-events-none" tabindex="-1">Next</a>
 	{/if}
 </div>
-
-<style lang="scss">
-	a[disabled] {
-		pointer-events: none;
-		text-decoration: none;
-		color: inherit;
-	}
-</style>

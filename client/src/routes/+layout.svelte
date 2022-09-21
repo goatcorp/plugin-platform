@@ -1,40 +1,19 @@
 <script lang="ts">
-	import 'normalize.css';
+	import '../app.css';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 </script>
 
-<div class="layout">
-	<header class="header">
+<div class="container mx-auto w-5/6">
+	<header class="p-9">
 		<Header />
 	</header>
 
-	<main class="content">
+	<main class="p-9">
 		<slot />
 	</main>
 
-	<footer class="footer">
+	<footer class="p-9">
 		<Footer />
 	</footer>
 </div>
-
-<style lang="scss">
-	.layout {
-		width: 70%;
-		margin: auto;
-
-		.content {
-			padding-right: 35px;
-			padding-left: 35px;
-		}
-
-		.footer {
-			padding: 35px;
-		}
-	}
-
-	* {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-			'Open Sans', 'Helvetica Neue', sans-serif;
-	}
-</style>

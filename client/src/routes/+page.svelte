@@ -20,17 +20,22 @@
 
 <div>
 	<h1>Search</h1>
-	<div>
-		<form method="get" action="/search">
-			<input type="search" placeholder="Search for presets..." name="q" />
-			<button><SearchIcon /></button>
-		</form>
-	</div>
+	<form method="get" action="/search" class="search">
+		<label class="input-group">
+			<input
+				type="search"
+				placeholder="Search for presets..."
+				name="q"
+				class="input input-bordered input-primary w-full max-w-xs"
+			/>
+			<button class="btn"><SearchIcon /></button>
+		</label>
+	</form>
 </div>
 
 <div>
 	<h1>Plugin presets</h1>
-	<a href="/presets">Go to all presets</a>
+	<a href="/presets" class="link link-primary">Go to all presets</a>
 	<h2>Popular</h2>
 	<!--Presets with a high absolute number of views-->
 	<PresetCardGallery
@@ -55,10 +60,3 @@
 		{showSpoilers}
 	/>
 </div>
-
-<style lang="scss">
-	* {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-			'Open Sans', 'Helvetica Neue', sans-serif;
-	}
-</style>

@@ -18,6 +18,7 @@
 			<li>
 				<a
 					href={`${provider.authUrl}${redirectUrl}`}
+					class="link link-primary"
 					on:click={() => {
 						sessionStorage.setItem(
 							'oauth2',
@@ -34,10 +35,3 @@
 		{/each}
 	</ul>
 </div>
-
-<style lang="scss">
-	* {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-			'Open Sans', 'Helvetica Neue', sans-serif;
-	}
-</style>
