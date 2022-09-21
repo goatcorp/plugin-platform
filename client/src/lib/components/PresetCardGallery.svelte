@@ -9,9 +9,9 @@
 	export let showSpoilers: boolean;
 </script>
 
-<div class="gallery">
+<div class="flex flex-wrap justify-around min-h-50">
 	{#each presets as preset}
-		<div class="wrapper">
+		<div class="mb-6 px-2">
 			<PresetCard
 				{preset}
 				stats={stats[preset.id]}
@@ -21,16 +21,3 @@
 		</div>
 	{/each}
 </div>
-
-<style lang="scss">
-	.gallery {
-		display: flex;
-		min-height: 50px;
-		flex-wrap: wrap;
-		justify-content: space-around;
-
-		.wrapper {
-			margin-bottom: 10px;
-		}
-	}
-</style>

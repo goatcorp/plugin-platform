@@ -20,5 +20,5 @@
 		{/each}
 	</select>
 {:else}
-	<span>{selectedPlugin?.name}</span>
+	<span>{selectedPlugin?.name || ''}</span>
 {/if}

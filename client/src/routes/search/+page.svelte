@@ -116,10 +116,3 @@
 </div>
 
 <PageSelector page={data.page} totalPages={data.totalPages} />
-
-<style lang="scss">
-	* {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-			'Open Sans', 'Helvetica Neue', sans-serif;
-	}
-</style>

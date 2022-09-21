@@ -14,7 +14,7 @@
 		{#if !readOnly}
 			<button on:click={() => onRemove(tag)}>Remove</button>
 		{/if}
-		<div class="tag">{tag}</div>
+		<div class="badge badge-secondary">{tag}</div>
 	</div>
 {/each}
 {#if tags.length === 0}
@@ -23,8 +23,8 @@
 
 {#if !readOnly}
 	<div>
-		<input style="display: block;" type="text" on:keyup={(e) => onSearch(e.currentTarget.value)} />
-		<select style="display: block;">
+		<input type="text" on:keyup={(e) => onSearch(e.currentTarget.value)} />
+		<select class="block">
 			{#each tagOptions as tag}
 				<option value={tag.id} on:click={() => onAdd(tag.id)}>{tag.label}</option>
 			{/each}
